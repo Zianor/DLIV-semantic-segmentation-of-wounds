@@ -1,0 +1,35 @@
+[project]
+name = "DLIV-chronic-wound-segmentation"
+version="0.0.1"
+description="My project for the course Deep Learning for Image & Video Processing at Maastricht University"
+dependencies = [
+    "albumentations==1.3.1",
+    "segmentation-models==1.0.1",
+    "numpy==1.24.3",
+    "jupyter==1.0.0",
+    "tensorflow==2.13.0",
+    "tensorflow-macos==2.13.0",
+    "tensorflow-metal==1.0.1",
+    "keras==2.13.1",
+    "pandas==2.0.3",
+]
+requires-python = ">=3.8, <=3.9"
+authors = [
+  {name = "Cay Rahn", email = "cj.rahn@student.maastrichtuniversity.nl"},
+]
+
+[project.optional-dependencies]
+dev = [
+    "isort",
+    "black",
+    "pre-commit"
+]
+
+[tool.black]
+line-length = 110
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.isort]
+combine_as_imports = true
+profile = "black"
