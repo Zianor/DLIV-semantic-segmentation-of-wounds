@@ -23,6 +23,10 @@ def get_linknet_local_model():
 
     local_model = PSPNet(backbone_name="mobilenet", input_shape=(48, 48, 3), classes=1, activation="sigmoid")
 
+    # those are the 16 outputs of the local model
+    # Citation:
+    # "the image is split into 16 different non-overlapping 48×48×3 patches, which are stacked to obtain a 48×48×(3×16)
+    # volume"
     out0 = local_model(layer[0])
     out1 = local_model(layer[1])
     out2 = local_model(layer[2])
@@ -40,13 +44,16 @@ def get_linknet_local_model():
     out14 = local_model(layer[14])
     out15 = local_model(layer[15])
 
+    # put the layers horizontally back together
     X_patch1 = tf.keras.layers.Lambda(putconcate)([out0, out1, out2, out3])
     X_patch2 = tf.keras.layers.Lambda(putconcate)([out4, out5, out6, out7])
     X_patch3 = tf.keras.layers.Lambda(putconcate)([out8, out9, out10, out11])
     X_patch4 = tf.keras.layers.Lambda(putconcate)([out12, out13, out14, out15])
 
+    # put the layers together vertically
     X_patch = tf.keras.layers.Lambda(putconcate_vert)([X_patch1, X_patch2, X_patch3, X_patch4])
 
+    # TODO: is this the convolution with the global model already? in the other file we have global + local model defined
     X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_patch)
 
     model_1 = tf.keras.models.Model(inputs=[in1], outputs=X_final)

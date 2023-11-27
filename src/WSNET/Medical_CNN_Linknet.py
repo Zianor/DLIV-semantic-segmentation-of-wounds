@@ -47,7 +47,7 @@ local_model = Linknet(
     backbone_name="mobilenet", input_shape=(64, 64, 3), classes=1, activation="sigmoid", encoder_freeze=False
 )
 
-
+# we have 3 x 3 layers instead of 4 x 4 as described in the paper
 out0 = local_model(layer[0])
 out1 = local_model(layer[1])
 out2 = local_model(layer[2])
