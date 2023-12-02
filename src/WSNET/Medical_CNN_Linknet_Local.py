@@ -86,7 +86,7 @@ def get_linknet_local_model():
     )
     val_gen = tf.data.Dataset.from_generator(
         generate_data,
-        args=[train_images, BATCH_SIZE, (width, height), False, True, False],
+        args=[validation_images, BATCH_SIZE, (width, height), False, True, False],
         output_signature=(
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
