@@ -60,19 +60,31 @@ class CreatePatches(tf.keras.layers.Layer):
         return patches
 
 
-def putconcate(x):
-    x1, x2, x3, x4 = x
-    return K.concatenate([x1, x2, x3, x4], axis=2)
+def putconcate(x, layer_count=4):
+    if layer_count == 4:
+        x1, x2, x3, x4 = x
+        return K.concatenate([x1, x2, x3, x4], axis=2)
+    elif layer_count == 3:
+        x1, x2, x3 = x
+        return K.concatenate([x1, x2, x3], axis=2)
 
 
-def putconcate_vert(x):
-    x1, x2, x3, x4 = x
-    return K.concatenate([x1, x2, x3, x4], axis=1)
+def putconcate_vert(x, layer_count=4):
+    if layer_count == 4:
+        x1, x2, x3, x4 = x
+        return K.concatenate([x1, x2, x3, x4], axis=1)
+    elif layer_count == 3:
+        x1, x2, x3 = x
+        return K.concatenate([x1, x2, x3], axis=1)
 
 
-def putall(x):
-    x1, x2, x3, x4, x5, x6, x7, x8, x9 = x
-    return K.stack([x1, x2, x3, x4, x5, x6, x7, x8, x9], axis=1)
+def putall(x, layer_count=9):
+    if layer_count == 9:
+        x1, x2, x3, x4, x5, x6, x7, x8, x9 = x
+        return K.stack([x1, x2, x3, x4, x5, x6, x7, x8, x9], axis=1)
+    elif layer_count == 16:
+        x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16 = x
+        return K.stack([x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16], axis=1)
 
 
 def merge_patches(x):

@@ -2,6 +2,8 @@ import os
 
 os.environ["SM_FRAMEWORK"] = "tf.keras"
 
+import os
+
 import numpy as np
 import segmentation_models as sm
 import tensorflow as tf
@@ -12,21 +14,19 @@ from src.helper import get_checkpoint_path, get_data_dirs
 from src.WSNET.helper import CreatePatches, generate_data, putconcate, putconcate_vert
 
 
-def get_linknet_local_model():
+def get_pspnet_local_model(train_model=False):
     sm.framework()
-
     sm.set_framework("tf.keras")
-
+    # sample_image = np.random.rand(1, 192 , 192 , 3 ).astype(np.float32)
     in1 = tf.keras.Input(shape=(192, 192, 3))
-    layer = CreatePatches(patch_size=48)
+    in2 = tf.keras.Input(shape=(192, 192, 3))
+    # input = (Input(shape=(192, 192, 3), name='input'))
+    layer = CreatePatches(48)
+    # print(layer)
     layer = layer(in1)
 
     local_model = PSPNet(backbone_name="mobilenet", input_shape=(48, 48, 3), classes=1, activation="sigmoid")
 
-    # those are the 16 outputs of the local model
-    # Citation:
-    # "the image is split into 16 different non-overlapping 48×48×3 patches, which are stacked to obtain a 48×48×(3×16)
-    # volume"
     out0 = local_model(layer[0])
     out1 = local_model(layer[1])
     out2 = local_model(layer[2])
@@ -44,16 +44,34 @@ def get_linknet_local_model():
     out14 = local_model(layer[14])
     out15 = local_model(layer[15])
 
-    # put the layers horizontally back together
     X_patch1 = tf.keras.layers.Lambda(putconcate)([out0, out1, out2, out3])
     X_patch2 = tf.keras.layers.Lambda(putconcate)([out4, out5, out6, out7])
     X_patch3 = tf.keras.layers.Lambda(putconcate)([out8, out9, out10, out11])
     X_patch4 = tf.keras.layers.Lambda(putconcate)([out12, out13, out14, out15])
 
-    # put the layers together vertically
     X_patch = tf.keras.layers.Lambda(putconcate_vert)([X_patch1, X_patch2, X_patch3, X_patch4])
 
-    # TODO: is this the convolution with the global model already? in the other file we have global + local model defined
+    # In[16]:
+
+    # In[17]:
+
+    # out_combined = tf.stack([out0, out1, out2, out3, out4, out5, out6, out7, out8, out9, out10, out11, out12, out13, out14, out15], axis=1)
+
+    # In[18]:
+
+    # rec_new = tf.space_to_depth(X_patch[-1],4)
+    # rec_new = tf.reshape(rec_new,[-1,192,192,1])
+
+    # In[19]:
+
+    # global_model = PSPNet(backbone_name='mobilenet',input_shape=(192, 192, 3),classes=1,activation='sigmoid')
+
+    # In[20]:
+
+    # in2 = tf.keras.Input(shape=(192,192,3))
+    # X_global_output = global_model(in2)
+
+    # is this the last convolution between local and global? but where is the gobal model
     X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_patch)
 
     model_1 = tf.keras.models.Model(inputs=[in1], outputs=X_final)
@@ -92,9 +110,12 @@ def get_linknet_local_model():
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
         ),
     )
+    for layer in model_1.layers:
+        layer.trainable = True
 
     epochs = 100
-    checkpoint_path = get_checkpoint_path("pspnet_local-2023-11-15", False)
+
+    checkpoint_path = get_checkpoint_path("pspnet_local")
 
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(
@@ -106,8 +127,6 @@ def get_linknet_local_model():
         loss=sm.losses.DiceLoss(),
         metrics=[sm.metrics.IOUScore(threshold=0.5), sm.metrics.FScore(threshold=0.5), "binary_accuracy"],
     )
-
-    train_model = False
 
     if train_model:
         model_1.fit(
@@ -126,3 +145,6 @@ def get_linknet_local_model():
 
     # print(results)
     return model_1, train_gen, val_gen
+
+
+get_pspnet_local_model()
