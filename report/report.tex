@@ -1,19 +1,30 @@
-\documentclass[11pt]{article}
+\documentclass[10pt]{scrarticle}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage[left=2.7cm, right=2.7cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage[left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
 \usepackage{setspace}
 \usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+
+\usepackage[backend=biber,
+hyperref=true,
+]{biblatex}
+\addbibresource{references.bib}
+\ExecuteBibliographyOptions{maxcitenames=1,mincitenames=1}
+
+\setlist[itemize]{noitemsep}
+\onehalfspacing
 
 \begin{document}
 
 \setstretch{1.3}
 \begin{titlepage}
 	\thispagestyle{empty}
+	\centering
 
 	\begin{minipage}[t]{\textwidth}
 	
@@ -33,7 +44,7 @@
 		\vspace{5cm}
 	\end{minipage}
 	
-	\begin{minipage}[t]{\textwidth}
+	\begin{minipage}[t]{0.8\textwidth}
 		\centering
 	
 		\large{\textbf{Cay Rahn}}
@@ -58,5 +69,10 @@
 \clearpage
 
 \input{doc/101-introduction}
+\input{doc/102-dataset}
+\input{doc/103-state-of-the-art}
+\input{doc/201-general-information}
+
+\printbibliography
 
 \end{document}
