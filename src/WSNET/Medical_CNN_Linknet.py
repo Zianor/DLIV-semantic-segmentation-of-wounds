@@ -11,9 +11,6 @@ import segmentation_models as sm
 import tensorflow as tf
 from segmentation_models import Linknet
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.layers import Concatenate, Conv2D, Lambda
-from tensorflow.keras.models import Model
 
 from src.helper import get_checkpoint_path, get_data_dirs
 from src.WSNET.helper import CreatePatches, generate_data, merge_patches, putall
@@ -63,12 +60,12 @@ def get_linknet_model(train_model=False):
     out7 = local_model(layer[7])
     out8 = local_model(layer[8])
 
-    X_patch = Lambda(putall)([out0, out1, out2, out3, out4, out5, out6, out7, out8])
+    X_patch = tf.keras.layers.Lambda(putall)([out0, out1, out2, out3, out4, out5, out6, out7, out8])
     print(X_patch)
 
     # out_combined = tf.stack([out0, out1, out2, out3, out4, out5, out6, out7, out8, out9, out10, out11, out12, out13, out14, out15], axis=1)
 
-    X_patch = Lambda(merge_patches)(X_patch)
+    X_patch = tf.keras.layers.Lambda(merge_patches)(X_patch)
 
     global_model = Linknet(
         backbone_name="mobilenet",
@@ -80,10 +77,10 @@ def get_linknet_model(train_model=False):
 
     X_global_output = global_model(in2)
 
-    X_final = Concatenate(axis=3)([X_patch, X_global_output])
-    X_final = Conv2D(1, 1, activation="sigmoid")(X_final)
+    X_final = tf.keras.layers.Concatenate(axis=3)([X_patch, X_global_output])
+    X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_final)
 
-    model_1 = Model(inputs=[in1, in2], outputs=X_final)
+    model_1 = tf.keras.models.Model(inputs=[in1, in2], outputs=X_final)
     model_1.summary()
 
     # data_dir = "./sample_corrected/sample/"
@@ -135,7 +132,11 @@ def get_linknet_model(train_model=False):
 
     checkpoint_path = get_checkpoint_path("linknet_wstech_imagenet1_nofreeze_densenet")
 
-    callbacks = [ModelCheckpoint(checkpoint_path, save_weights_only=True, save_best_only=True, mode="min")]
+    callbacks = [
+        tf.keras.callbacks.ModelCheckpoint(
+            checkpoint_path, save_weights_only=True, save_best_only=True, mode="min"
+        )
+    ]
     model_1.compile(
         "Adam",
         loss=sm.losses.DiceLoss(),
