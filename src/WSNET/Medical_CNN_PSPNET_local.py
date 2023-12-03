@@ -17,12 +17,8 @@ from src.WSNET.helper import CreatePatches, generate_data, putconcate, putconcat
 def get_pspnet_local_model(train_model=False):
     sm.framework()
     sm.set_framework("tf.keras")
-    # sample_image = np.random.rand(1, 192 , 192 , 3 ).astype(np.float32)
     in1 = tf.keras.Input(shape=(192, 192, 3))
-    in2 = tf.keras.Input(shape=(192, 192, 3))
-    # input = (Input(shape=(192, 192, 3), name='input'))
     layer = CreatePatches(48)
-    # print(layer)
     layer = layer(in1)
 
     local_model = PSPNet(backbone_name="mobilenet", input_shape=(48, 48, 3), classes=1, activation="sigmoid")
@@ -51,27 +47,6 @@ def get_pspnet_local_model(train_model=False):
 
     X_patch = tf.keras.layers.Lambda(putconcate_vert)([X_patch1, X_patch2, X_patch3, X_patch4])
 
-    # In[16]:
-
-    # In[17]:
-
-    # out_combined = tf.stack([out0, out1, out2, out3, out4, out5, out6, out7, out8, out9, out10, out11, out12, out13, out14, out15], axis=1)
-
-    # In[18]:
-
-    # rec_new = tf.space_to_depth(X_patch[-1],4)
-    # rec_new = tf.reshape(rec_new,[-1,192,192,1])
-
-    # In[19]:
-
-    # global_model = PSPNet(backbone_name='mobilenet',input_shape=(192, 192, 3),classes=1,activation='sigmoid')
-
-    # In[20]:
-
-    # in2 = tf.keras.Input(shape=(192,192,3))
-    # X_global_output = global_model(in2)
-
-    # is this the last convolution between local and global? but where is the global model
     X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_patch)
 
     model_1 = tf.keras.models.Model(inputs=[in1], outputs=X_final)
@@ -155,7 +130,7 @@ def get_pspnet_local_model(train_model=False):
     # results = model_1.evaluate(val_gen, steps=np.ceil(float(len(validation_images)) / float(BATCH_SIZE)))
 
     # print(results)
-    return model_1, train_gen, val_gen
+    return model_1, train_gen, val_gen, test_gen
 
 
 get_pspnet_local_model()

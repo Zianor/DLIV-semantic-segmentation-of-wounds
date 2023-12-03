@@ -29,7 +29,6 @@ def get_unet_local_model(train_model=False):
         encoder_freeze=True,
     )
 
-    # TODO: check why we are splitting in 64x64 instead of 48
     out0 = local_model(layer[0])
     out1 = local_model(layer[1])
     out2 = local_model(layer[2])
@@ -50,7 +49,6 @@ def get_unet_local_model(train_model=False):
         [X_patch1, X_patch2, X_patch3]
     )
 
-    # TODO: is this the convolution with the global model already? in the other file we have global + local model defined
     X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_patch)
 
     model_1 = tf.keras.models.Model(inputs=[in1], outputs=X_final)
@@ -131,4 +129,4 @@ def get_unet_local_model(train_model=False):
     # results = model_1.evaluate(val_gen, steps=np.ceil(float(len(validation_images)) / float(BATCH_SIZE)))
 
     # print(results)
-    return model_1, train_gen, val_gen
+    return model_1, train_gen, val_gen, test_gen

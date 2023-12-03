@@ -19,22 +19,6 @@ sm.framework()
 sm.set_framework("tf.keras")
 
 
-class StitchPatches(tf.keras.layers.Layer):
-    def __init__(self, batch_size):
-        super(StitchPatches, self).__init__()
-        self.batch_size = batch_size
-
-    def call(self, inputs):
-        print(inputs)
-        patches = []
-        main_image = np.empty([inputs.shape[0], 192, 192, inputs.shape[3]])
-        for k in range(0, inputs.shape[0], self.batch_size):
-            for i in range(0, 192, 48):
-                for j in range(0, 192, 48):
-                    main_image[i : i + 48, j : j + 48, :] = inputs[k]
-        return main_image
-
-
 def get_linknet_model(train_model=False):
     in1 = tf.keras.Input(shape=(192, 192, 3))
     in2 = tf.keras.Input(shape=(192, 192, 3))
@@ -83,12 +67,6 @@ def get_linknet_model(train_model=False):
     model_1 = tf.keras.models.Model(inputs=[in1, in2], outputs=X_final)
     model_1.summary()
 
-    # data_dir = "./sample_corrected/sample/"
-    # #data_dir = "./train/sample/"
-    # #data_dir = "./miccai2/images/"
-    # mask_dir = "./sample_corrected/mask/"
-    # #mask_dir = "./train/masked_images/"
-    # #mask_dir = "./miccai2/labels/"
     data_dir, mask_dir = get_data_dirs(False)
 
     all_images = os.listdir(data_dir)
@@ -114,7 +92,7 @@ def get_linknet_model(train_model=False):
         generate_data,
         args=[train_images, BATCH_SIZE, (width, height), True, False, False, True],
         output_signature=(
-            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
+            (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
         ),
     )
@@ -122,7 +100,7 @@ def get_linknet_model(train_model=False):
         generate_data,
         args=[validation_images, BATCH_SIZE, (width, height), False, True, False, True],
         output_signature=(
-            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
+            (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
         ),
     )
@@ -130,7 +108,7 @@ def get_linknet_model(train_model=False):
         generate_data,
         args=[test_images, BATCH_SIZE, (width, height), False, False, True, True],
         output_signature=(
-            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
+            (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
         ),
     )
@@ -141,7 +119,7 @@ def get_linknet_model(train_model=False):
 
     epochs = 100
 
-    checkpoint_path = get_checkpoint_path("linknet_wstech_imagenet1_nofreeze_densenet")
+    checkpoint_path = get_checkpoint_path("linknet")
 
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(
@@ -167,4 +145,7 @@ def get_linknet_model(train_model=False):
     else:
         model_1.load_weights(checkpoint_path)
 
-    return model_1, train_gen, val_gen
+    return model_1, train_gen, val_gen, test_gen
+
+
+get_linknet_model(True)

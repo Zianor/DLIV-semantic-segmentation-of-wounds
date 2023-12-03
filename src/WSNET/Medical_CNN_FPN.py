@@ -18,22 +18,6 @@ sm.framework()
 sm.set_framework("tf.keras")
 
 
-class StitchPatches(tf.keras.layers.Layer):
-    def __init__(self, batch_size):
-        super(StitchPatches, self).__init__()
-        self.batch_size = batch_size
-
-    def call(self, inputs):
-        print(inputs)
-        patches = []
-        main_image = np.empty([inputs.shape[0], 192, 192, inputs.shape[3]])
-        for k in range(0, inputs.shape[0], self.batch_size):
-            for i in range(0, 192, 48):
-                for j in range(0, 192, 48):
-                    main_image[i : i + 48, j : j + 48, :] = inputs[k]
-        return main_image
-
-
 def get_fpn_model(train_model=False):
     in1 = tf.keras.Input(shape=(192, 192, 3))
     in2 = tf.keras.Input(shape=(192, 192, 3))
@@ -60,9 +44,6 @@ def get_fpn_model(train_model=False):
     out8 = local_model(layer[8])
 
     X_patch = tf.keras.layers.Lambda(putall)([out0, out1, out2, out3, out4, out5, out6, out7, out8])
-    print(X_patch)
-
-    # out_combined = tf.stack([out0, out1, out2, out3, out4, out5, out6, out7, out8, out9, out10, out11, out12, out13, out14, out15], axis=1)
 
     X_patch = tf.keras.layers.Lambda(merge_patches)(X_patch)
 
@@ -160,7 +141,7 @@ def get_fpn_model(train_model=False):
     else:
         model_1.load_weights(checkpoint_path)
 
-    return model_1, train_gen, val_gen
+    return model_1, train_gen, val_gen, test_gen
 
 
 get_fpn_model(True)

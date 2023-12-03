@@ -30,10 +30,6 @@ def get_fpn_local_model(train_model=False):
         encoder_freeze=False,
     )
 
-    # those are the 16 outputs of the local model
-    # Citation:
-    # "the image is split into 16 different non-overlapping 48×48×3 patches, which are stacked to obtain a 48×48×(3×16)
-    # volume"
     out0 = local_model(layer[0])
     out1 = local_model(layer[1])
     out2 = local_model(layer[2])

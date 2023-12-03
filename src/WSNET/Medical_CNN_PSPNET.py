@@ -17,16 +17,13 @@ from src.WSNET.helper import CreatePatches, generate_data, merge_patches, putall
 def get_pspnet_model(train_model=False):
     sm.framework()
     sm.set_framework("tf.keras")
-    # sample_image = np.random.rand(1, 192 , 192 , 3 ).astype(np.float32)
     in1 = tf.keras.Input(shape=(192, 192, 3))
     in2 = tf.keras.Input(shape=(192, 192, 3))
-    # input = (Input(shape=(192, 192, 3), name='input'))
     layer = CreatePatches(48)
-    # print(layer)
     layer = layer(in1)
 
     local_model = PSPNet(
-        backbone_name="densenet121",
+        backbone_name="mobilenet",
         input_shape=(48, 48, 3),
         classes=1,
         activation="sigmoid",
@@ -56,8 +53,18 @@ def get_pspnet_model(train_model=False):
 
     X_patch = tf.keras.layers.Lambda(merge_patches)(X_patch)
 
-    # is this the last convolution between local and global? but where is the gobal model
-    X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_patch)
+    global_model = PSPNet(
+        backbone_name="mobilenet",
+        input_shape=(192, 192, 3),
+        classes=1,
+        activation="sigmoid",
+        encoder_freeze=False,
+    )
+
+    X_global_output = global_model(in2)
+
+    X_final = tf.keras.layers.Concatenate(axis=3)([X_patch, X_global_output])
+    X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_final)
 
     model_1 = tf.keras.models.Model(inputs=[in1], outputs=X_final)
     model_1.summary()
@@ -86,7 +93,7 @@ def get_pspnet_model(train_model=False):
         generate_data,
         args=[train_images, BATCH_SIZE, (width, height), True, False, False],
         output_signature=(
-            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
+            (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
         ),
     )
@@ -94,7 +101,7 @@ def get_pspnet_model(train_model=False):
         generate_data,
         args=[validation_images, BATCH_SIZE, (width, height), False, True, False],
         output_signature=(
-            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
+            (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
         ),
     )
@@ -102,7 +109,7 @@ def get_pspnet_model(train_model=False):
         generate_data,
         args=[test_images, BATCH_SIZE, (width, height), False, False, True],
         output_signature=(
-            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
+            (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
         ),
     )
@@ -111,7 +118,7 @@ def get_pspnet_model(train_model=False):
 
     epochs = 100
 
-    checkpoint_path = get_checkpoint_path("pspnet_wstech_imagenet1_nofreeze_mobilenet")
+    checkpoint_path = get_checkpoint_path("pspnet")
 
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(
@@ -140,4 +147,4 @@ def get_pspnet_model(train_model=False):
     # results = model_1.evaluate(val_gen, steps=np.ceil(float(len(validation_images)) / float(BATCH_SIZE)))
 
     # print(results)
-    return model_1, train_gen, val_gen
+    return model_1, train_gen, val_gen, test_gen

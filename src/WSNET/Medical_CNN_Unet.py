@@ -22,8 +22,9 @@ def get_unet_model(train_model=False):
     layer = CreatePatches(64)
     layer = layer(in1)
 
+    # input size must be dividable by 32
     local_model = Unet(
-        backbone_name="densenet169",
+        backbone_name="mobilenet",
         input_shape=(64, 64, 3),
         classes=1,
         activation="sigmoid",
@@ -47,7 +48,7 @@ def get_unet_model(train_model=False):
     X_patch = tf.keras.layers.Lambda(merge_patches)(X_patch)
 
     global_model = Unet(
-        backbone_name="densenet169",
+        backbone_name="mobilenet",
         input_shape=(192, 192, 3),
         classes=1,
         activation="sigmoid",
@@ -137,4 +138,4 @@ def get_unet_model(train_model=False):
     # results = model_1.evaluate(val_gen, steps=np.ceil(float(len(validation_images)) / float(BATCH_SIZE)))
 
     # print(results)
-    return model_1, train_gen, val_gen
+    return model_1, train_gen, val_gen, test_gen
