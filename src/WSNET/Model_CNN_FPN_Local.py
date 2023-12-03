@@ -18,10 +18,17 @@ def get_fpn_local_model(train_model=False):
     sm.set_framework("tf.keras")
 
     in1 = tf.keras.Input(shape=(192, 192, 3))
-    layer = CreatePatches(patch_size=48)
+    layer = CreatePatches(patch_size=64)
     layer = layer(in1)
 
-    local_model = FPN(backbone_name="mobilenet", input_shape=(48, 48, 3), classes=1, activation="sigmoid")
+    # FPN does not work with a patch size of 48
+    local_model = FPN(
+        backbone_name="mobilenet",
+        input_shape=(64, 64, 3),
+        classes=1,
+        activation="sigmoid",
+        encoder_freeze=False,
+    )
 
     # those are the 16 outputs of the local model
     # Citation:
@@ -36,22 +43,16 @@ def get_fpn_local_model(train_model=False):
     out6 = local_model(layer[6])
     out7 = local_model(layer[7])
     out8 = local_model(layer[8])
-    out9 = local_model(layer[9])
-    out10 = local_model(layer[10])
-    out11 = local_model(layer[11])
-    out12 = local_model(layer[12])
-    out13 = local_model(layer[13])
-    out14 = local_model(layer[14])
-    out15 = local_model(layer[15])
 
     # put the layers horizontally back together
-    X_patch1 = tf.keras.layers.Lambda(putconcate)([out0, out1, out2, out3])
-    X_patch2 = tf.keras.layers.Lambda(putconcate)([out4, out5, out6, out7])
-    X_patch3 = tf.keras.layers.Lambda(putconcate)([out8, out9, out10, out11])
-    X_patch4 = tf.keras.layers.Lambda(putconcate)([out12, out13, out14, out15])
+    X_patch1 = tf.keras.layers.Lambda(putconcate, arguments=dict(layer_count=3))([out0, out1, out2])
+    X_patch2 = tf.keras.layers.Lambda(putconcate, arguments=dict(layer_count=3))([out3, out4, out5])
+    X_patch3 = tf.keras.layers.Lambda(putconcate, arguments=dict(layer_count=3))([out6, out7, out8])
 
     # put the layers together vertically
-    X_patch = tf.keras.layers.Lambda(putconcate_vert)([X_patch1, X_patch2, X_patch3, X_patch4])
+    X_patch = tf.keras.layers.Lambda(putconcate_vert, arguments=dict(layer_count=3))(
+        [X_patch1, X_patch2, X_patch3]
+    )
 
     X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_patch)
 
