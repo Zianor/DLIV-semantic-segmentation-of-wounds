@@ -71,7 +71,7 @@ def get_pspnet_local_model(train_model=False):
     # in2 = tf.keras.Input(shape=(192,192,3))
     # X_global_output = global_model(in2)
 
-    # is this the last convolution between local and global? but where is the gobal model
+    # is this the last convolution between local and global? but where is the global model
     X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_patch)
 
     model_1 = tf.keras.models.Model(inputs=[in1], outputs=X_final)
@@ -85,10 +85,13 @@ def get_pspnet_local_model(train_model=False):
     total_train_images = all_images[: int(len(all_images) * to_train)]
     len(total_train_images)
 
-    train_images, validation_images = train_test_split(
-        total_train_images, train_size=0.8, test_size=0.2, random_state=0
+    train_images, test_images = train_test_split(
+        total_train_images, train_size=0.7, test_size=0.3, random_state=0
     )
-    print(len(train_images), len(validation_images))
+    test_images, validation_images = train_test_split(
+        total_train_images, train_size=0.5, test_size=0.5, random_state=0
+    )
+    print(len(train_images), len(validation_images), len(test_images))
 
     BATCH_SIZE = 16
     width = 192
@@ -105,6 +108,14 @@ def get_pspnet_local_model(train_model=False):
     val_gen = tf.data.Dataset.from_generator(
         generate_data,
         args=[validation_images, BATCH_SIZE, (width, height), False, True, False],
+        output_signature=(
+            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
+            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
+        ),
+    )
+    test_gen = tf.data.Dataset.from_generator(
+        generate_data,
+        args=[test_images, BATCH_SIZE, (width, height), False, False, True],
         output_signature=(
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),

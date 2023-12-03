@@ -67,10 +67,13 @@ def get_fpn_local_model(train_model=False):
     total_train_images = all_images[: int(len(all_images) * to_train)]
     len(total_train_images)
 
-    train_images, validation_images = train_test_split(
-        total_train_images, train_size=0.8, test_size=0.2, random_state=0
+    train_images, test_images = train_test_split(
+        total_train_images, train_size=0.7, test_size=0.3, random_state=0
     )
-    print(len(train_images), len(validation_images))
+    test_images, validation_images = train_test_split(
+        total_train_images, train_size=0.5, test_size=0.5, random_state=0
+    )
+    print(len(train_images), len(validation_images), len(test_images))
 
     BATCH_SIZE = 16
     width = 192
@@ -92,6 +95,17 @@ def get_fpn_local_model(train_model=False):
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
         ),
     )
+    test_gen = tf.data.Dataset.from_generator(
+        generate_data,
+        args=[test_images, BATCH_SIZE, (width, height), False, False, True],
+        output_signature=(
+            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)),
+            tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
+        ),
+    )
+
+    for layer in model_1.layers:
+        layer.trainable = True
 
     epochs = 100
     checkpoint_path = get_checkpoint_path("fpn_local", False)
@@ -123,7 +137,7 @@ def get_fpn_local_model(train_model=False):
     # results = model_1.evaluate(val_gen, steps=np.ceil(float(len(validation_images)) / float(BATCH_SIZE)))
 
     # print(results)
-    return model_1, train_gen, val_gen
+    return model_1, train_gen, val_gen, test_gen
 
 
 get_fpn_local_model(True)
