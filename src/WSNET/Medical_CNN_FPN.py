@@ -142,6 +142,3 @@ def get_fpn_model(train_model=False):
         model_1.load_weights(checkpoint_path)
 
     return model_1, train_gen, val_gen, test_gen
-
-
-get_fpn_model(True)

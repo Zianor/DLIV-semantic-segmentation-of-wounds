@@ -12,7 +12,7 @@ from src.helper import get_checkpoint_path, get_data_dirs
 from src.WSNET.helper import CreatePatches, generate_data, putconcate, putconcate_vert
 
 
-def get_linknet_local_model():
+def get_linknet_local_model(train_model=False):
     sm.framework()
 
     sm.set_framework("tf.keras")
@@ -106,8 +106,6 @@ def get_linknet_local_model():
         loss=sm.losses.DiceLoss(),
         metrics=[sm.metrics.IOUScore(threshold=0.5), sm.metrics.FScore(threshold=0.5), "binary_accuracy"],
     )
-
-    train_model = False
 
     if train_model:
         model_1.fit(

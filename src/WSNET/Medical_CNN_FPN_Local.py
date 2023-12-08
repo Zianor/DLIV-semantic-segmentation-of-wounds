@@ -134,6 +134,3 @@ def get_fpn_local_model(train_model=False):
 
     # print(results)
     return model_1, train_gen, val_gen, test_gen
-
-
-get_fpn_local_model(True)

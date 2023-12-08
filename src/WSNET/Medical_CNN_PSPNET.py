@@ -66,7 +66,7 @@ def get_pspnet_model(train_model=False):
     X_final = tf.keras.layers.Concatenate(axis=3)([X_patch, X_global_output])
     X_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(X_final)
 
-    model_1 = tf.keras.models.Model(inputs=[in1], outputs=X_final)
+    model_1 = tf.keras.models.Model(inputs=[in1, in2], outputs=X_final)
     model_1.summary()
 
     data_dir, mask_dir = get_data_dirs(False)
@@ -91,7 +91,7 @@ def get_pspnet_model(train_model=False):
 
     train_gen = tf.data.Dataset.from_generator(
         generate_data,
-        args=[train_images, BATCH_SIZE, (width, height), True, False, False],
+        args=[train_images, BATCH_SIZE, (width, height), True, False, False, True],
         output_signature=(
             (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
@@ -99,7 +99,7 @@ def get_pspnet_model(train_model=False):
     )
     val_gen = tf.data.Dataset.from_generator(
         generate_data,
-        args=[validation_images, BATCH_SIZE, (width, height), False, True, False],
+        args=[validation_images, BATCH_SIZE, (width, height), False, True, False, True],
         output_signature=(
             (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
@@ -107,7 +107,7 @@ def get_pspnet_model(train_model=False):
     )
     test_gen = tf.data.Dataset.from_generator(
         generate_data,
-        args=[test_images, BATCH_SIZE, (width, height), False, False, True],
+        args=[test_images, BATCH_SIZE, (width, height), False, False, True, True],
         output_signature=(
             (tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3)), tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 3))),
             tf.TensorSpec(shape=(BATCH_SIZE, 192, 192, 1)),
