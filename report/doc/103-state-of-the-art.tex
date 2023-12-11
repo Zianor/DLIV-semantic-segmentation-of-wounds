@@ -1,1 +1,137 @@
 \section{State of the Art}
+
+\subsection{Semantic Segmentation}
+
+\begin{itemize}
+	\item semantic segmentation (pixel-wise classification)
+	\item deep learning methods dominant in the last years (since we have CNNs)
+	\item most techniques for segantic segmantion use encoder-decoder as base for network architecture, inspired by auto-encoders \cite{linknet}.
+	\item encoder: information in feature space /context information \cite{linknet, MO2022626}
+	\item decoder: information mapped into spatial categorization \cite{linknet, MO2022626}
+	\item encoder subsampling, decoder upsampling \cite{Norelyaqine2023}
+	\item "encoder network weights typically pre-trained on the large ImageNet object classification dataset" \cite{SegNet}
+	\item in case of wound segmentation we have two classes: foreground, the wound and background
+\end{itemize}
+
+4 different segmentation models used in this project: Unet, Linknet, FPN and PSPNet, all fully convolutional models.
+
+Fully convolutional Neural Networks
+\begin{itemize}
+	\item deconvolution to upsample high-dimensional features maps \cite{Norelyaqine2023}
+	\item retain spatial information
+	\item in base form: loss of information
+\end{itemize}
+
+\paragraph{U-Net}
+
+U-Net is a convolutional network developed for Biomedical Image Segmentation \cite{unet}. 
+
+\begin{itemize}
+	\item encoder/decoder (in paper called contracting and expansive path)
+	\item encoder (contracting path) is CNN: repeated application of two 3x3 convolutions (unpadded), followed by ReLU and 2x2 max pooling operation (stride 2) for downsampling $\rightarrow$ number of features is doubled
+	\item expansive path: repeated step consisting of an upsampling of the feature map followed by 2x2 convolution (halving number of feature channels), concatenation with the correspondingly cropped feature map from contracting path and two 3 x 3 convolutions
+	\item each step followed by ReLU
+	\item cropping neccessary due to loss of border pixels in every convolution
+	\item final layer: 1x1 convolution to map 64 component feature vector to disired number of classes
+	\item in total 23 convolutional layers
+	\item input-tile size must be chosen s.t. all 2x2 max-pooling operations are applied to a layer with an even x and y size
+	\item large niput tiles favored
+	\item energy function: pixel-wised soft-max over final feature map combined with cross entropy loss function
+	\item data augmentation for robustness witch few training samples
+	\item "U-net contains a context path to learn context information and a spatial path to preserve spatial information" \cite{MO2022626}
+	\item encoder is usually backbone \cite{MO2022626}
+	\item skip connections
+	\item its ability to generalize to multi-scale information is limited \cite{Norelyaqine2023}
+\end{itemize}
+% from paper, relatively close in wording, some direct citations
+
+\paragraph{Linknet}
+
+\begin{itemize}
+	\item encoder: initial block (convolutiuon with 7x7 kernel and stride 2, spatial max-pooling 3x3 with stride 2), later blocks (convolution 3x3 with stride 2, conv 3x3, TODO) \cite{linknet}
+	\item decoder: earlier blocks (TODO), last block (full conv with 3x3 kernel with upsampling of factor 2, convolution 3x3, full-conv (2x2 with upsampling of factor 2)
+	\item implementation used has 4 skip connections instead of the original 4 \cite{SegmentationModels}
+	\item "LinkNet sends spatial information directly from the encoder to the matching decoder, conserving as much of the image’s spatial information as feasible."
+	\item "directly connects shallow feature map in encoder module to the decoder module of the corresponding size" $\rightarrow$ accurate position information on shallow layer, avoids redundant parameters and computations \cite{Norelyaqine2023}
+\end{itemize}
+
+\paragraph{FPN}
+
+\begin{itemize}
+	\item long for Feature Pyramid Network
+	\item creating feature maps of various layers and sizes \cite{Norelyaqine2023}
+	\item bottom-up pathway: "feature hierarchy consisting of feature maps at several scales with scaling step of 2"\cite{fpn}
+	\item top-down-pthway and lateral connections": "higher resolution features by upsampling spatially coarser, but semantically stronger, fea- ture maps from higher pyramid levels", enhance with features from bottom-up pathway via lateral connections $\rightarrow$ merge feature maps of same spatial size from both pathways\cite{fpn}
+	\item bottom-up feature map: lower-level sementatics but activations more accurately localized (fewer subsampling)\cite{fpn}
+	\item creation of top-down feature maps: upsample and then merge\cite{fpn}
+	\item final feature contains local and global context information\cite{fpn}
+\end{itemize}
+
+
+\paragraph{PSPNet}
+
+\begin{itemize}
+	\item long for Pyramid Scene Parsing Network
+	\item feature map extracted with pretrained backbone
+	\item pyramid pooling to get context information
+	\item pyramid pooling: fusion of features under four different pyramid scales (global pooling and sub-regions for different locations), 1x1 convolution to maintain weight of global feature after each pyramid, upsampling of output to get same size as original feature map
+	\item "different levels of features concatenated as final pyramid pooling feature"
+	\item final prediction by convolution layer which input isoriginal feature map concatenated with pyramid pooling output
+	\item motivation: pyramid pooling provides levels of information, more helpful than global pooling
+\end{itemize}
+
+\subsubsection{Evaluation}
+
+There exist several methods to evaluate how good a predicted segmentation is. Since semantic segmentation performs a pixel-wise classification, resulting in a segmentation mask, classical metrics such as accuracy and precision are available. Two performance metrics that are commonly used in semantic segmentation in medical imaging are the Dice Coefficient and the Intersetcion over Union (IoU) score. They indicate the segmentation quality better than pixel-wise accuracy \cite{Eelbode}.
+
+\begin{itemize}
+	\item loss function often uses pixel-wise (weighted) cross-entropy loss even though differentiable approximations of the two metrics exist \cite{Eelbode}
+\end{itemize}
+
+\paragraph{IOUScore}
+
+The IoU-Score (Intersection over Union), also known as the Jaccard index $J$ describes the ratio between the intersection of the ground truth mask $y$ and the predicted mask $\tilde{y}$ and the union of the predicted and the ground truth mask. By this it compares the similarity of the two masks \cite{Cho2021WeightedIO}.
+
+\begin{align}
+	\text{IoU}(y, \tilde{y} :&= \frac{\text{Area of overlap}}{\text{Area of union}}\\
+	&=\frac{|y \cap \tilde{y}|}{|y \cup \tilde {y}|}
+\end{align}
+
+
+\paragraph{Dice Coefficient}
+
+The Dice coefficient is the F1 score calclulated for the image masks. In terms of intersection and union, this means it calculates the ratio between two times the overlap between ground truth $y$ and predicted mask $\tilde{y}$ and the total area.
+
+\begin{align}
+	\text{Dice}(y, \tilde{y}) :&= 2 \cdot \frac{\text{Area of overlap}}{\text{Total area}}\\
+	&= 2 \cdot \frac{|y \cap \tilde{y}|}{|y| + |\tilde{y}|}
+\end{align}
+
+To gain more insight into the type of the errors the model makes, the rate of false positives and false negatives can be used do differentiate Type I and Type II errors \cite{DFUC2022}.
+
+% "The difference between the two metrics is that the IoU penalizes under- and over-segmentation more than DSC"
+
+\subsection{Wound Segmentation}
+
+% What are wounds that need to be segmented? Focus on chronic wounds
+\begin{itemize}
+	\item one type: diabetic foot ulcers $\rightarrow$ are monitored to ensure healing process is optimal and there is no infection, normally long time span \cite{DFUC2022}
+\end{itemize}
+
+% Why is wound segmentation a more complex segmentation problem
+\begin{itemize}
+	\item wounds have complex structure containing different types of tissue with different colour and texture $\rightarrow$ different regions with borders in between \cite{AhmadFauzi2015}
+	\item heterogeneous wound images
+\end{itemize}
+
+% what models do exist by now, what is the sota
+\begin{itemize}
+	\item before deep networks: features describing color and texture, algorithms such as region growing and optimal thresholding or classical machine learning models, e.g. Support Vector Machines \cite{Scebba2022}
+	\item Convolutional Neural Networks then used, manually extracted features replaced by the ones the CNN learns autonomously \cite{Scebba2022}
+	\item some methods include pre-processing steps to remove background (User interaction, manual feature engineering to detect background pixels, standardizing background in advance before taking feature) $\rightarrow$ not automatic
+	\item Diabetic Foot Ulcer Challenge 2022 used FCN, U-Net and SegNet with different backbones as baseline for their challenge (categorical cross-entropy loss) \cite{DFUC2022}
+	\item \citeauthor{Scebba2022} proposed two step method: object detector that produces bounding boxes containing the wounds and then segmentation on those areas (u-net, convNet, DeepLapV3 with ResNet-101 backbone and FCN with VGG16 backbone, pixel-wise weighted binary cross entropy loss, weighting term was computed as the ratio between the total number of wound bed and background pixels of each training set fold)
+\end{itemize}
+
+
+

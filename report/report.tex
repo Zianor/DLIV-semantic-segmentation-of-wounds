@@ -1,20 +1,28 @@
-\documentclass[10pt]{scrarticle}
+\documentclass[parskip=half]{scrarticle}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{multirow}
 \usepackage[left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
 \usepackage{setspace}
 \usepackage[hidelinks]{hyperref}
+\usepackage{csquotes}
 \usepackage{enumitem}
 
-\usepackage[backend=biber,
+\usepackage[
+backend=biber,
 hyperref=true,
+maxcitenames=1,
+mincitenames=1,
+url=false,
+doi=true
 ]{biblatex}
+
 \addbibresource{references.bib}
-\ExecuteBibliographyOptions{maxcitenames=1,mincitenames=1}
+
 
 \setlist[itemize]{noitemsep}
 \onehalfspacing
@@ -67,10 +75,12 @@ hyperref=true,
 	
 \end{titlepage}
 \clearpage
+\setcounter{page}{1}
 
 \input{doc/101-introduction}
 \input{doc/102-dataset}
 \input{doc/103-state-of-the-art}
+\input{doc/104-wsnet}
 \input{doc/201-general-information}
 
 \printbibliography
