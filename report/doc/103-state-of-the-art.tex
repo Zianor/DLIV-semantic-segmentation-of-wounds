@@ -130,7 +130,48 @@ To gain more insight into the type of the errors the model makes, the rate of fa
 	\item Convolutional Neural Networks then used, manually extracted features replaced by the ones the CNN learns autonomously \cite{Scebba2022}
 	\item some methods include pre-processing steps to remove background (User interaction, manual feature engineering to detect background pixels, standardizing background in advance before taking feature) $\rightarrow$ not automatic
 	\item Diabetic Foot Ulcer Challenge 2022 used FCN, U-Net and SegNet with different backbones as baseline for their challenge (categorical cross-entropy loss) \cite{DFUC2022}
+	\item generally often classical models used with minor adaptions
+	\item following standing out
 	\item \citeauthor{Scebba2022} proposed two step method: object detector that produces bounding boxes containing the wounds and then segmentation on those areas (u-net, convNet, DeepLapV3 with ResNet-101 backbone and FCN with VGG16 backbone, pixel-wise weighted binary cross entropy loss, weighting term was computed as the ratio between the total number of wound bed and background pixels of each training set fold)
+	\item \citeauthor{Oota_2023_WACV} claim they set a new state of the art, their method will described in more detail in the following
+\end{itemize}
+
+
+\subsubsection{WSNET}
+
+\begin{itemize}
+	\item based on the four before described segmentation architectures: U-Net, LinkNet, PSPNet and FPN
+	\item experimented with different backbones, in the scope of this project MobileNet \cite{howard2017mobilenets} is used since it is the smallest one and allows faster training
+	\item all backbones with ImageNet pre-trained weights
+	\item they performed Wound-Domain Adaptive Pretraining by classifying the wound images in 5 ulcer types
+	\item data augmentation on the training data and corresponding masks, not on test data
+	\item augmentation consists of horizontal flip, random rotation, optical distortion, grid distortion, blur, random brightness contrast, and transpose
+\end{itemize}
+
+\paragraph{Global-Local Architecture}
+
+\begin{itemize}
+	\item motivation: obtain global signals from entire image and local signals from smaller patches for details
+	\item only local might cause incomplete segmentation for large wounds
+	\item local architecture: split image in 16 non-overlapping patches (48x48x3), stacking results in 48x48x(3x16) volume
+	\item parallel 16 local models with shared weights
+	\item combined to full-size mask at end
+	\item stack output of global and local model to output of size (192x192x2)
+	\item 1x1 convolution to get final mask
+\end{itemize}
+
+% own judgement of method
+\begin{itemize}
+	\item interesting that they use segmentation models that already use methods to localize method, e.g. FPN already considers different context sizes
+\end{itemize}
+
+
+\paragraph{Reported Results}
+
+\begin{itemize}
+	\item pretraining on wound images improves results
+	\item data augmentation leads to improvements
+	\item local only models significantly worse than global model
 \end{itemize}
 
 
