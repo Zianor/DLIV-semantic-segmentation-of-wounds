@@ -3,7 +3,8 @@ from math import ceil
 import segmentation_models as sm
 import tensorflow as tf
 
-from src.helper import get_checkpoint_path, get_datasets, split_train_test_validation
+from src.helper import get_checkpoint_path
+from src.WSNET.helper import get_datasets, split_train_test_validation
 from src.WSNET.global_local_model import create_global_local_model
 from src.WSNET.local_model import create_local_model
 
@@ -56,7 +57,6 @@ def train_model(
         two_inputs=two_inputs,
         input_size=input_size,
         batch_size=batch_size,
-        epochs=100,
     )
 
     if not load_only:

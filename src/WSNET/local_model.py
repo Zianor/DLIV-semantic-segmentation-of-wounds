@@ -75,6 +75,7 @@ def create_local_model(segmentation_model, input_size=192):
         patch = tf.keras.layers.Lambda(putconcate, arguments=dict(layer_count=patches_per_dimension))(
             patch_outputs[i * patches_per_dimension : (i + 1) * patches_per_dimension]
         )
+        horizontally_concat.append(patch)
 
     x_patch = tf.keras.layers.Lambda(putconcate_vert, arguments=dict(layer_count=patches_per_dimension))(
         horizontally_concat

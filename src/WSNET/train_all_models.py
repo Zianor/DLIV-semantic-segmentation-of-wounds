@@ -1,3 +1,7 @@
+import os
+
+os.environ['SM_FRAMEWORK'] = "tf.keras"
+
 from src.WSNET.wsnet import train_model
 
 if __name__ == "__main__":
