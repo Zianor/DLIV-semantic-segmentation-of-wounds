@@ -20,31 +20,6 @@ def assign_patches(x):
     return image
 
 
-class StitchPatches(tf.keras.layers.Layer):
-    def __init__(self, batch_size):
-        super(StitchPatches, self).__init__()
-        self.batch_size = batch_size
-
-    def call(self, inputs):
-        patches = []
-        b = []
-        # TODO: in other scrpits than Medical_CNN_Linknet-local the first shape param is inputs.shape[0] and the last
-        #  inputs.shape[3] and there are other changes as well
-        # main_image = np.empty([inputs.shape[0], 192, 192, inputs.shape[3]])
-        # for k in range(0, inputs.shape[0], self.batch_size):
-        #     for i in range(0 ,192, 48):
-        #         for j in range(0 ,192 , 48):
-        #             main_image[i : i + 48 , j : j + 48 , : ] = inputs[k]
-        # return main_image
-        main_image = np.zeros([8, 192, 192, 1])
-        k = 0
-        for i in range(0, 192, 48):
-            for j in range(0, 192, 48):
-                main_image[0, i : i + 48, j : j + 48, 0] = inputs[0, 0, 0 : 0 + 48, 0 : 0 + 48, 0]
-                k += 1
-        return main_image
-
-
 class CreatePatches(tf.keras.layers.Layer):
     def __init__(self, patch_size):
         super(CreatePatches, self).__init__()
@@ -118,19 +93,8 @@ transform = A.Compose(
 def generate_data(images_list, batch_size, dims, train=False, val=False, test=False, two_inputs=False):
     """Replaces Keras' native ImageDataGenerator."""
     data_dir, mask_dir = get_data_dirs(colab=False)
-    try:
-        if train is True:
-            # print(images_list)
-            image_file_list = images_list
-            label_file_list = images_list
-        elif val is True:
-            image_file_list = images_list
-            label_file_list = images_list
-        elif test is True:
-            image_file_list = images_list
-            label_file_list = images_list
-    except ValueError:
-        print("one of train or val or test need to be True")
+    if not (train or val or test):
+        raise ValueError("one of train or val or test need to be True")
     i = 0
     while True:
         image_batch = []
@@ -140,29 +104,42 @@ def generate_data(images_list, batch_size, dims, train=False, val=False, test=Fa
             if i == len(images_list):
                 i = 0
             if i < len(images_list):
+                # get the filenames
                 sample_image_filename = images_list[i].decode("utf-8")
                 sample_label_filename = images_list[i].decode("utf-8")
-                # print('image: ', image_file_list[i])
-                # print('label: ', label_file_list[i])
+
+                # read the image
                 image = cv2.imread(os.path.join(data_dir, sample_image_filename), 1)
                 image = cv2.resize(image, dims)
+
+                # read the lable
                 label = cv2.imread(os.path.join(mask_dir, sample_label_filename), 0)
                 label = cv2.resize(label, dims)
-                # image, label = self.change_color_space(image, label, self.color_space)
                 label = np.expand_dims(label, axis=2)
-                transformed = transform(image=image, image0=label)
-                aug_img = transformed["image"]
-                aug_mask = transformed["image0"]
-                # print(label.shape)
-                image_batch.append(aug_img)
-                image_batch1.append(aug_img)
-                label_batch.append(aug_mask)
+
+                if not test:  # do not transform test images
+                    # transform images
+                    transformed = transform(image=image, image0=label)
+                    aug_img = transformed["image"]  # transformed wound images
+                    aug_mask = transformed["image0"]  # transformed mask
+
+                    # append augmented images to lists
+                    image_batch.append(aug_img)
+                    image_batch1.append(aug_img)
+                    label_batch.append(aug_mask)
+                else:  # for test images
+                    # append original images to lists
+                    image_batch.append(image)
+                    image_batch1.append(image)
+                    label_batch.append(label)
             i += 1
+
+        # normalize per batch
         if image_batch and label_batch:
             image_batch = normalize(np.array(image_batch))
             image_batch1 = normalize(np.array(image_batch1))
             label_batch = normalize(np.array(label_batch))
             if not two_inputs:
-                yield (image_batch, label_batch)
+                yield image_batch, label_batch
             else:
                 yield (image_batch, image_batch1), label_batch
