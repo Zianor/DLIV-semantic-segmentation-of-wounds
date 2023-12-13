@@ -76,7 +76,7 @@ def get_fpn_model(train_model=False):
         total_train_images, train_size=0.7, test_size=0.3, random_state=0
     )
     test_images, validation_images = train_test_split(
-        total_train_images, train_size=0.5, test_size=0.5, random_state=0
+        test_images, train_size=0.5, test_size=0.5, random_state=0
     )
     print(len(train_images), len(validation_images), len(test_images))
 
