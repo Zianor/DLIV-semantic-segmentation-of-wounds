@@ -4,7 +4,7 @@
 
 Although the code for WSNET \cite{Oota_2023_WACV} is stated to be publicly available, a closer inspection of the linked GitHub repository shows, that this is only partially the case. A lack of documentations makes it hard to make use of the code, especially since the code seems to contain some errors.
 
-In the scope of this project, the code was used to create runable models again. Unfortunately, the classes of the wounds are not available, which makes it impossible to perform pre-training as it was described in the original paper \cite{Oota_2023_WACV}. In total there are eight models available: A local model and a combined global-local model for each of the segmentation models Unet, PSPNet, FPN, and Linknet. The Python library used for the segmentation models is \texttt{segmentation\_models} \cite{SegmentationModels}. The implementation processed showed some differences to the described model architecture. In particular, it was claimed that the wound images were split up in parts of 48\,px times 48\,px. However, some of the used models only allow input sizes that are divisable by 32 and the GitHub showed a size of 64\,px was used.
+In the scope of this project, the code was used to create runable models again. Unfortunately, the classes of the wounds are not available, which makes it impossible to perform pre-training as it was described in the original paper \cite{Oota_2023_WACV}. In total there are eight models available: A local model and a combined global-local model for each of the segmentation models Unet, PSPNet, FPN, and Linknet. The Python library used for the segmentation models is \texttt{segmentation\_models} \cite{SegmentationModels}. The implementation processed showed some differences to the described model architecture. In particular, it was claimed that the wound images were split up in parts of 48\,px times 48\,px. However, three of the four models, all beside PSPNet, only allow input sizes that are divisable by 32 and the GitHub showed a size of 64\,px was used. Another difference between available code and the paper is, that it is clamed that augmentation is not performed on the test images which is not the case in the available code.
 
 Information about the size of training, validation and test set is not given in the paper or code. In the scope of this project, a split of 70\,\% training, 15\,\% validation and 15\,\% test data is used. 
 
@@ -15,8 +15,9 @@ Information about the size of training, validation and test set is not given in 
 	\hline
 	& IoUe & Dice & IoU & Dice & IoU & Dice & IoU & Dice \\
 	\hline\hline
-	\textbf{Global-Local model} & 0.739 & 0.856 & 0.752 & 0.854 & 0.729 & 0.847 & 0.761 & 0.861\\
-	\textbf{Local model} & 0.546&  0.831 & 0.540 & 0.831 & 0.536 & 0.805 & 0.557 & 0.817 \\	
+	\textbf{Global-Local model} & 0.495 & 0.658 & 0.618 & 0.763 & 0.476 & 0.642 & 0.612 & 0.758\\
+	\textbf{Local model} & 0.359 & 0.523 & 0.398 & 0.564 & 0.373 & 0.538 & 0.408 & 0.574 \\	
+	\textbf{Global model} & \\
 	\end{tabular}
 	\caption{IoUe-Scores and Dice Coefficients for the four different models with each Global-Local and Local architecture. The backbone used is mobilenet.}
 \end{table}

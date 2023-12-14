@@ -84,10 +84,6 @@ U-Net is a convolutional network developed for Biomedical Image Segmentation \ci
 
 There exist several methods to evaluate how good a predicted segmentation is. Since semantic segmentation performs a pixel-wise classification, resulting in a segmentation mask, classical metrics such as accuracy and precision are available. Two performance metrics that are commonly used in semantic segmentation in medical imaging are the Dice Coefficient and the Intersetcion over Union (IoU) score. They indicate the segmentation quality better than pixel-wise accuracy \cite{Eelbode}.
 
-\begin{itemize}
-	\item loss function often uses pixel-wise (weighted) cross-entropy loss even though differentiable approximations of the two metrics exist \cite{Eelbode}
-\end{itemize}
-
 \paragraph{IOUScore}
 
 The IoU-Score (Intersection over Union), also known as the Jaccard index $J$ describes the ratio between the intersection of the ground truth mask $y$ and the predicted mask $\tilde{y}$ and the union of the predicted and the ground truth mask. By this it compares the similarity of the two masks \cite{Cho2021WeightedIO}.
@@ -110,6 +106,14 @@ The Dice coefficient is the F1 score calclulated for the image masks. In terms o
 To gain more insight into the type of the errors the model makes, the rate of false positives and false negatives can be used do differentiate Type I and Type II errors \cite{DFUC2022}.
 
 % "The difference between the two metrics is that the IoU penalizes under- and over-segmentation more than DSC"
+
+\subsubsection{Loss function}
+
+\begin{itemize}
+	\item loss function often uses pixel-wise (weighted) cross-entropy loss even though differentiable approximations of the two metrics exist \cite{Eelbode}
+\end{itemize}
+
+% DiceLoss is used in the code
 
 \subsection{Wound Segmentation}
 
@@ -163,6 +167,8 @@ To gain more insight into the type of the errors the model makes, the rate of fa
 % own judgement of method
 \begin{itemize}
 	\item interesting that they use segmentation models that already use methods to localize method, e.g. FPN already considers different context sizes
+	\item chosen patch size implies some property of the wound images, which size is important for local information
+	\item they stated in their paper that they tested different patch sizes and chose 48 because it lead to the best results
 \end{itemize}
 
 
@@ -172,6 +178,7 @@ To gain more insight into the type of the errors the model makes, the rate of fa
 	\item pretraining on wound images improves results
 	\item data augmentation leads to improvements
 	\item local only models significantly worse than global model
+	\item global only models worse than global-local model
 \end{itemize}
 
 
