@@ -64,7 +64,7 @@ def create_global_local_model(segmentation_model, input_size=192):
         )
         global_model = Linknet(
             backbone_name="mobilenet",
-            input_shape=(patch_size, patch_size, 3),
+            input_shape=(input_size, input_size, 3),
             classes=1,
             activation="sigmoid",
             encoder_freeze=False,
