@@ -9,7 +9,7 @@ if __name__ == "__main__":
     test_images_count = 403
     batch_size = 16
     segmentation_models = ["unet", "pspnet", "fpn", "linknet"]
-    model_architectures = ["global-local", "local"]
+    model_architectures = ["global-local", "local", "global"]
     for model_architecture in model_architectures:
         for segmentation_model in segmentation_models:
             model, train_gen, val_gen, test_gen = train_model(
