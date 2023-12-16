@@ -30,8 +30,8 @@ Similar to U-Net, Linknet contains of an encoder block for downsampling and a de
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\textwidth]{fig/linknet-architecture.jpg}
-	\caption{A visualisation of the LinkNet architecture originally provided by \citeauthor{Norelyaqine2023} \cite{Norelyaqine2023}.}
+	\includegraphics[width=0.5\textwidth]{fig/linknet-architecture.png}
+	\caption{A visualisation of the LinkNet architecture originally provided by \citeauthor{SegmentationModels} \cite{SegmentationModels}.}
 	\label{fig:linknet-architecture}
 \end{figure}
 
@@ -43,17 +43,24 @@ Similar to U-Net, Linknet contains of an encoder block for downsampling and a de
 
 The implementation used in this project has four skip connections instead of the original three \cite{SegmentationModels}. Similarly to the U-Net, the input size is restricted such that every upsampling operations need to be applied to an even x and y size.
 
+Linknet has been shown to achieve better results than U-Net under similar conditions \cite{Gao2022}.
+
 \paragraph{FPN}
 
-\begin{itemize}
-	\item long for Feature Pyramid Network
-	\item creating feature maps of various layers and sizes \cite{Norelyaqine2023}
-	\item bottom-up pathway: "feature hierarchy consisting of feature maps at several scales with scaling step of 2"\cite{fpn}
-	\item top-down-pthway and lateral connections": "higher resolution features by upsampling spatially coarser, but semantically stronger, fea- ture maps from higher pyramid levels", enhance with features from bottom-up pathway via lateral connections $\rightarrow$ merge feature maps of same spatial size from both pathways\cite{fpn}
-	\item bottom-up feature map: lower-level sementatics but activations more accurately localized (fewer subsampling)\cite{fpn}
-	\item creation of top-down feature maps: upsample and then merge\cite{fpn}
-	\item final feature contains local and global context information\cite{fpn}
-\end{itemize}
+The Feature Pyramid Network (FPN) architecture creates feature maps of various sizes in multiple layers \cite{Norelyaqine2023}. Similar to the other architectures in consists of an encoder and a decoder, called bottom-up and top-down pathway here\cite{fpn}. Similarly to U-Net, feature maps at different scales with a scaling step of 2 are created in the encoder \cite{fpn}. In the decoder, the feature maps are upsampled and combined with the encoder information of the same level. Similarly to LinkNet, addition is used in the skip connections, but an 1x1 convolution is applied. By doing this so-called feature pyramids are build, containing features at different resolution. \citeauthor{kirillov2019panoptic} proposed a method to use these feature pyramids to obtain a segmentation by merging the feature maps using addition or concatenation \cite{kirillov2019panoptic, SegmentationModels}. The architecture is visualised in figure \ref{fig:fpn-architecture}.
+%\begin{itemize}
+%	\item top-down-pthway and lateral connections": "higher resolution features by upsampling spatially coarser, but semantically stronger, feature maps from higher pyramid levels", enhance with features from bottom-up pathway via lateral connections $\rightarrow$ merge feature maps of same spatial size from both pathways\cite{fpn}
+%	\item bottom-up feature map: lower-level sementatics but activations more accurately localized (fewer subsampling)\cite{fpn}
+%	\item creation of top-down feature maps: upsample and then merge\cite{fpn}
+%	\item final feature contains local and global context information\cite{fpn}
+%\end{itemize}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.6\textwidth]{fig/fpn-architecture.png}
+	\caption{A visualisation of the FPN architecture originally provided by \citeauthor{SegmentationModels} \cite{SegmentationModels}. Note, that the feature maps can combined either by concatenation or addition.}
+	\label{fig:fpn-architecture}
+\end{figure}
 
 
 \paragraph{PSPNet}
