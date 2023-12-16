@@ -6,7 +6,7 @@ The segmentation of wounds belongs to the class of semantic segmantation problem
 
 Pre-training for such models requires a huge amount of data. A typical data set for such pre-training is the ImageNet object classification data set \cite{SegNet}.
 
-In this project, four different segmentation models are used: U-Net, Linknet, FPN and PSPNet. All are improved architectures about a basic fCNN.
+In this project, four different segmentation models are used: U-Net, Linknet, FPN and PSPNet. All are improved architectures about a basic fCNN. Each architecture is described in detail to understand challenges and approaches of localizing information in space.
 
 \paragraph{U-Net}
 
@@ -15,7 +15,7 @@ U-Net is a convolutional network developed for Biomedical Image Segmentation, ba
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{fig/unet-architecture.png}
-	\caption{U-Net architecture for 32x32 pixels in the lowes resolution. Blue boxes are feature maps with the number of feature-channels on top of the boxes and the size shown on the left size. Operations are indicated by the arrows. The figure originally create by \citeauthor{unet} \cite{unet}.}
+	\caption{U-Net architecture for 32x32 pixels in the lowes resolution. Blue boxes are feature maps with the number of feature-channels on top of the boxes and the size shown on the left size. Operations are indicated by the arrows. The skip connections are a concatenation. The figure originally create by \citeauthor{unet} \cite{unet}.}
 	\label{fig:unet-architecture}
 \end{figure}
 
@@ -26,13 +26,22 @@ One restriction is, that the input size must be chosen such that all 2x2 max-poo
 
 \paragraph{Linknet}
 
-\begin{itemize}
-	\item encoder: initial block (convolutiuon with 7x7 kernel and stride 2, spatial max-pooling 3x3 with stride 2), later blocks (convolution 3x3 with stride 2, conv 3x3, TODO) \cite{linknet}
-	\item decoder: earlier blocks (TODO), last block (full conv with 3x3 kernel with upsampling of factor 2, convolution 3x3, full-conv (2x2 with upsampling of factor 2)
-	\item implementation used has 4 skip connections instead of the original 4 \cite{SegmentationModels}
-	\item "LinkNet sends spatial information directly from the encoder to the matching decoder, conserving as much of the image’s spatial information as feasible."
-	\item "directly connects shallow feature map in encoder module to the decoder module of the corresponding size" $\rightarrow$ accurate position information on shallow layer, avoids redundant parameters and computations \cite{Norelyaqine2023}
-\end{itemize}
+Similar to U-Net, Linknet contains of an encoder block for downsampling and a decoder block for upsampling. The downsampling is not done by max pooling as it is in the U-Net architecture but by using a stride of 2 in a convolutional layer. Also does the inital encoder block differ from the following blocks as it uses a larger kernel and uses max pooling. The decoder blocks upsample by a factor of 2 in each block. The final block differs again from the previous blocks. The main difference to the U-Net architecture is how the skip connections are used: Similarly to the U-Net, there are skip connections between the corresponding steps of encoder and decoder, but the feature map from the encoder is not concatenated but added to decoder data. The linknet architecture is visualised in figure \ref{fig:linknet-architecture}. \cite{linknet}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig/linknet-architecture.jpg}
+	\caption{A visualisation of the LinkNet architecture originally provided by \citeauthor{Norelyaqine2023} \cite{Norelyaqine2023}.}
+	\label{fig:linknet-architecture}
+\end{figure}
+
+
+%\begin{itemize}
+%	\item "LinkNet sends spatial information directly from the encoder to the matching decoder, conserving as much of the image’s spatial information as feasible."
+%	\item "directly connects shallow feature map in encoder module to the decoder module of the corresponding size" $\rightarrow$ accurate position information on shallow layer, avoids redundant parameters and computations \cite{Norelyaqine2023}
+%\end{itemize}
+
+The implementation used in this project has four skip connections instead of the original three \cite{SegmentationModels}. Similarly to the U-Net, the input size is restricted such that every upsampling operations need to be applied to an even x and y size.
 
 \paragraph{FPN}
 
