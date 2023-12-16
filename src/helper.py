@@ -29,17 +29,27 @@ def plot_first_batch(model, test_gen, two_inputs=False, batch_size=16):
         num_rows = ceil(batch_size / 2)
         plt.subplots(num_rows, 6, figsize=(12, 16))
         for i in range(batch_size):
+            if i == 0 or i == 1:
+                add_title = True
+            else:
+                add_title = False
             plt.subplot(num_rows, 6, i * 3 + 1)
             if two_inputs:
                 plt.imshow(image[0][i, :, :, :])
             else:
                 plt.imshow(image[i, :, :, :])
+            if add_title:
+                plt.title("Wound Image")
             plt.axis("off")
             plt.subplot(num_rows, 6, i * 3 + 2)
             plt.imshow(res[i, :, :, :], cmap="gray")
             plt.axis("off")
+            if add_title:
+                plt.title("Predicted mask")
             plt.subplot(num_rows, 6, i * 3 + 3)
             plt.imshow(label[i, :, :, :], cmap="gray")
+            if add_title:
+                plt.title("Ground truth mask")
             plt.axis("off")
         plt.tight_layout()
         plt.show()
