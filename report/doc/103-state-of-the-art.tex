@@ -1,6 +1,6 @@
 \section{State of the Art}
 
-\subsection{Semantic Segmentation}
+\subsection{Semantic Segmentation}\label{sec:semantic-segmentation}
 
 The segmentation of wounds belongs to the class of semantic segmantation problems, where a pixel-wise classification is performed. In the case of wound segmentation there are two classes: foreground, which is the wound, and background. Deep Learning methods became dominant in the last years because they became more accessible. Fully Convolutional Neural Networks (fCNN) as a starting point in research had the drawback of resulting in a low output resolution and multiple techniques were invented to increase the output resolution \cite{Litjens2017}. This results in an encoder-decoder architecture as base for the networks, inspired by auto-encoders \cite{linknet}, where the encoder subsamples and the decoder upsamples \cite{Norelyaqine2023}. In such architectures the encoder generates context information, information in the feature space while the decoder maps this information into the spatial context.
 
@@ -112,12 +112,12 @@ To gain more insight into the type of the errors the model makes, the rate of fa
 
 \subsubsection{Data Augmentation}
 
-\begin{itemize}
-	\item augmentation useful especially if available data is limited
-	\item makes it more robust and accurate
-	\item augmentations can be divided in two categories: position augmentation and color augmentation
-	\item what augmentations are appropriate for the application
-\end{itemize}
+Data Augmentation is a useful technique to make trained models more robust and accurate. This is especially the case if available data is limited, as the data set size can be either increased or the data set can be made more diverse.
+
+For images, there exist several different possible augmentations. First of all, there are different positional augmentations, including cropping, flipping, rotating and resizing the image. Another class of augmentations are color augmentations, changing the brightness, contrast and saturation of the image. Other augmentations include blurring and dropouts.
+
+Not every augmentation is appropriate for every application. Rotating images of standing animals by 180 degrees for example would not make sense, while rotating images of wounds is appropriate. Therefore, augmentations must be chosen carefully depending on the application.
+
 
 % https://nanonets.com/blog/data-augmentation-how-to-use-deep-learning-when-you-have-limited-data-part-2/
 % https://www.v7labs.com/blog/data-augmentation-guide
@@ -125,40 +125,25 @@ To gain more insight into the type of the errors the model makes, the rate of fa
 
 \subsection{Wound Segmentation}
 
-% What are wounds that need to be segmented? Focus on chronic wounds
-\begin{itemize}
-	\item one type: diabetic foot ulcers $\rightarrow$ are monitored to ensure healing process is optimal and there is no infection, normally long time span \cite{DFUC2022}
-\end{itemize}
 
-% Why is wound segmentation a more complex segmentation problem
-\begin{itemize}
-	\item wounds have complex structure containing different types of tissue with different colour and texture $\rightarrow$ different regions with borders in between \cite{AhmadFauzi2015}
-	\item heterogeneous wound images
-\end{itemize}
+As already discussed in the motivation of this project, wound segmentation is a complex problem due to wound characteristics such as different tissues and therefore edges in a wound itself on one side and technical reasons such as e.g. varying lightning, distance to the wound and different angles. 
 
-% what models do exist by now, what is the sota
-\begin{itemize}
-	\item before deep networks: features describing color and texture, algorithms such as region growing and optimal thresholding or classical machine learning models, e.g. Support Vector Machines \cite{Scebba2022}
-	\item Convolutional Neural Networks then used, manually extracted features replaced by the ones the CNN learns autonomously \cite{Scebba2022}
-	\item some methods include pre-processing steps to remove background (User interaction, manual feature engineering to detect background pixels, standardizing background in advance before taking feature) $\rightarrow$ not automatic
-	\item Diabetic Foot Ulcer Challenge 2022 used FCN, U-Net and SegNet with different backbones as baseline for their challenge (categorical cross-entropy loss) \cite{DFUC2022}
-	\item generally often classical models used with minor adaptions
-	\item following standing out
-	\item \citeauthor{Scebba2022} proposed two step method: object detector that produces bounding boxes containing the wounds and then segmentation on those areas (u-net, convNet, DeepLapV3 with ResNet-101 backbone and FCN with VGG16 backbone, pixel-wise weighted binary cross entropy loss, weighting term was computed as the ratio between the total number of wound bed and background pixels of each training set fold)
-	\item \citeauthor{Oota_2023_WACV} claim they set a new state of the art, their method will described in more detail in the following
-\end{itemize}
+Before Deep Learning became easily accessible and popular, methods based on features describing color and textures, region growing and optimal thresholding algorithms and classical machine learning models were used to perform segmentation \cite{Scebba2022}. Convolutional Neural Networks replaced manually extracted features by autonomously learned ones \cite{Scebba2022}. Some methods included pre-processing steps to remove the background by e.g. user interaction indicating the background, using a standardized background when taking the image or using manual feature engineering to detect the background more efficiently and make the wound segmentation task easier. Such non-automatic steps limit the use of the segmentation algorithms because they either require more ressources in the image taking process, in the segmentation process or are specifically tailored for specific conditions of lighting or camera settings.
 
+The Diabetic Foot Ulcer Challenge 2022 used FCN, U-Net and SegNet with different backbones and categorical cross-entropy loss as baseline for their challenge, indicating those methods reflect the current state of the art that needs to be improved \cite{DFUC2022}. Generally, such classic models are commonly used and extended with minor adaptions. Two methods stood out in the performed literature review, including more sophisticated adaptions.
+
+\citeauthor{Scebba2022} proposed a method consisting of two steps: An object detection step that produces bounding boxes containing the wounds and a second step that performs segmentation on those areas. Segmentation itself is performed using classical architectures for semantic segmentation as described in section \ref{sec:semantic-segmentation}. The loss function used was pixel-wise weighted binary cross entropy loss. Weighting was calculated based on the number of wound and background pixels of each training set fold.
+%TODO: make say why i did not consider this approach
+
+\citeauthor{Oota_2023_WACV} claim they set a new state of the art for wound segmentation while providing a data set together with their work \cite{Oota_2023_WACV}. The latter made them a suitable method for further investigation in the scope of this project. Their approach is described in more detail in the following section.
 
 \subsubsection{WSNET}
 
-\begin{itemize}
-	\item based on the four before described segmentation architectures: U-Net, LinkNet, PSPNet and FPN
-	\item experimented with different backbones, in the scope of this project MobileNet \cite{howard2017mobilenets} is used since it is the smallest one and allows faster training
-	\item all backbones with ImageNet pre-trained weights
-	\item they performed Wound-Domain Adaptive Pretraining by classifying the wound images in 5 ulcer types
-	\item data augmentation on the training data and corresponding masks, not on test data
-	\item augmentation consists of horizontal flip, random rotation, optical distortion, grid distortion, blur, random brightness contrast, and transpose
-\end{itemize}
+The framework proposed by \citeauthor{Oota_2023_WACV} uses the four before described segmentation architectures: U-Net, LinkNet, PSPNet and FPN. Experiments with different backbones were performed in their work, but in the scope of this project mainly MobileNet \cite{howard2017mobilenets} is used since it is the smallest one which allows faster training which is needed in the limited time of the project.
+
+ImageNet pre-trained weights are used. WSNET also describes pre-training specific to wounds, called Wound-Domain Adaptive Pretraining. During this pre-training wound images are classified into five different ulcer types.
+
+To make their models more robust, \citeauthor{Oota_2023_WACV} experiment with data augmentiton on the training data and the corresponding masks including optical distortion, horizontal flip, random rotation, blur and more.
 
 \paragraph{Global-Local Architecture}
 
