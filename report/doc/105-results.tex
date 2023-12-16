@@ -1,0 +1,26 @@
+\section{Results and Evaluation}
+
+\subsection{Re-implementation and evaluation of WSNET}
+
+\begin{itemize}
+	\item contribution: reimplementation of a framework in a better documented way, making the reconstruction of results easier
+	\item documentation of this implementation
+	\item identified discrepances between paper and available code
+	\item comparison of results
+	\item showed that reported "good" architecture does not yield significant performance increasements
+	\item why: models already capture localized information, this is why those are sota segmenatation frameworks, further localization does not really make sense, maybe rather change parameters of used models to improve results
+	\item Which architecture is suited best for wound segmentation? Why and what other alternatives would there be?
+\end{itemize}
+
+\subsection{Robustness of wound segmentation}
+
+\begin{itemize}
+	\item augmentations commonly performed to improve robustness of models
+	\item can also be used to access robustness of the resulting model
+	\item for clinical application, lightning and size might vary between images
+	\item batch normalization might further increase this problem (TODO: search references)
+	\item 
+\end{itemize}
+
+
+\subsection{Explainability of segmentation results}

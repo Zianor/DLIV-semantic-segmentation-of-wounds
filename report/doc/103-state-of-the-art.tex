@@ -2,48 +2,27 @@
 
 \subsection{Semantic Segmentation}
 
-\begin{itemize}
-	\item semantic segmentation (pixel-wise classification)
-	\item deep learning methods dominant in the last years (since we have CNNs)
-	\item most techniques for segantic segmantion use encoder-decoder as base for network architecture, inspired by auto-encoders \cite{linknet}.
-	\item encoder: information in feature space /context information \cite{linknet, MO2022626}
-	\item decoder: information mapped into spatial categorization \cite{linknet, MO2022626}
-	\item encoder subsampling, decoder upsampling \cite{Norelyaqine2023}
-	\item "encoder network weights typically pre-trained on the large ImageNet object classification dataset" \cite{SegNet}
-	\item in case of wound segmentation we have two classes: foreground, the wound and background
-\end{itemize}
+The segmentation of wounds belongs to the class of semantic segmantation problems, where a pixel-wise classification is performed. In the case of wound segmentation there are two classes: foreground, which is the wound, and background. Deep Learning methods became dominant in the last years because they became more accessible. Fully Convolutional Neural Networks (fCNN) as a starting point in research had the drawback of resulting in a low output resolution and multiple techniques were invented to increase the output resolution \cite{Litjens2017}. This results in an encoder-decoder architecture as base for the networks, inspired by auto-encoders \cite{linknet}, where the encoder subsamples and the decoder upsamples \cite{Norelyaqine2023}. In such architectures the encoder generates context information, information in the feature space while the decoder maps this information into the spatial context.
 
-4 different segmentation models used in this project: Unet, Linknet, FPN and PSPNet, all fully convolutional models.
+Pre-training for such models requires a huge amount of data. A typical data set for such pre-training is the ImageNet object classification data set \cite{SegNet}.
 
-Fully convolutional Neural Networks
-\begin{itemize}
-	\item deconvolution to upsample high-dimensional features maps \cite{Norelyaqine2023}
-	\item retain spatial information
-	\item in base form: loss of information
-\end{itemize}
+In this project, four different segmentation models are used: U-Net, Linknet, FPN and PSPNet. All are improved architectures about a basic fCNN.
 
 \paragraph{U-Net}
 
-U-Net is a convolutional network developed for Biomedical Image Segmentation \cite{unet}. 
+U-Net is a convolutional network developed for Biomedical Image Segmentation, based on an encoder-decoder architecture. Encoder and decoder are called contracting and expansive path in the original paper, describing their function. They are also described as context path and spatial path \cite{MO2022626}. Both, encoder and decoder consist of different steps to encode and decode the image on different spatial levels. The encoder is a classical CNN; each step consists of two convolutions and a max pooling operation for downsampling. The decoder step upsamples the feature map followed by a convolution. The result is then concatenated with the corresponding feature map from the encdoer path and convolution is applied again. In the final layer, 1x1 convolution is used to map the feature vector to the desired number of classes. This architecture is visualised in figure \ref{fig:unet-architecture}. \cite{unet}
 
-\begin{itemize}
-	\item encoder/decoder (in paper called contracting and expansive path)
-	\item encoder (contracting path) is CNN: repeated application of two 3x3 convolutions (unpadded), followed by ReLU and 2x2 max pooling operation (stride 2) for downsampling $\rightarrow$ number of features is doubled
-	\item expansive path: repeated step consisting of an upsampling of the feature map followed by 2x2 convolution (halving number of feature channels), concatenation with the correspondingly cropped feature map from contracting path and two 3 x 3 convolutions
-	\item each step followed by ReLU
-	\item cropping neccessary due to loss of border pixels in every convolution
-	\item final layer: 1x1 convolution to map 64 component feature vector to disired number of classes
-	\item in total 23 convolutional layers
-	\item input-tile size must be chosen s.t. all 2x2 max-pooling operations are applied to a layer with an even x and y size
-	\item large niput tiles favored
-	\item energy function: pixel-wised soft-max over final feature map combined with cross entropy loss function
-	\item data augmentation for robustness witch few training samples
-	\item "U-net contains a context path to learn context information and a spatial path to preserve spatial information" \cite{MO2022626}
-	\item encoder is usually backbone \cite{MO2022626}
-	\item skip connections
-	\item its ability to generalize to multi-scale information is limited \cite{Norelyaqine2023}
-\end{itemize}
-% from paper, relatively close in wording, some direct citations
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig/unet-architecture.png}
+	\caption{U-Net architecture for 32x32 pixels in the lowes resolution. Blue boxes are feature maps with the number of feature-channels on top of the boxes and the size shown on the left size. Operations are indicated by the arrows. The figure originally create by \citeauthor{unet} \cite{unet}.}
+	\label{fig:unet-architecture}
+\end{figure}
+
+The skip connections, connecting the different levels of encoder and decoder prevent a loss of information and extracting the features at different resolutions to retrieve spatial information. By doing this, it is one of the first architectures improving the classical fCNN for semantic segmantation \cite{Litjens2017}. While U-Net provides spatial localization of features, its ability to generalize to multi-scale information is limited \cite{Norelyaqine2023}.
+
+One restriction is, that the input size must be chosen such that all 2x2 max-pooling operations in the encoder are applied to an even x and y size.
+
 
 \paragraph{Linknet}
 
@@ -114,6 +93,19 @@ To gain more insight into the type of the errors the model makes, the rate of fa
 \end{itemize}
 
 % DiceLoss is used in the code
+
+\subsubsection{Data Augmentation}
+
+\begin{itemize}
+	\item augmentation useful especially if available data is limited
+	\item makes it more robust and accurate
+	\item augmentations can be divided in two categories: position augmentation and color augmentation
+	\item what augmentations are appropriate for the application
+\end{itemize}
+
+% https://nanonets.com/blog/data-augmentation-how-to-use-deep-learning-when-you-have-limited-data-part-2/
+% https://www.v7labs.com/blog/data-augmentation-guide
+
 
 \subsection{Wound Segmentation}
 
