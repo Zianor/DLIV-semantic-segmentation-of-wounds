@@ -18,9 +18,9 @@ def get_data_dirs(colab=False):
 
 def get_checkpoint_path(model_name, colab=False):
     if colab:
-        return f"/content/drive/MyDrive/DLIV/wacv/{model_name}.h5"
+        return f"/content/drive/MyDrive/DLIV/trained_models/{model_name}.h5"
     else:
-        return os.path.join(Path(__file__).parent, "wacv", f"{model_name}.h5")
+        return os.path.join(Path(__file__).parent, "trained_models", f"{model_name}.h5")
 
 
 def plot_first_batch(model, test_gen, two_inputs=False, batch_size=16):
