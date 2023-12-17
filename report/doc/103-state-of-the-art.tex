@@ -48,12 +48,6 @@ Linknet has been shown to achieve better results than U-Net under similar condit
 \paragraph{FPN}
 
 The Feature Pyramid Network (FPN) architecture creates feature maps of various sizes in multiple layers \cite{Norelyaqine2023}. Similar to the other architectures in consists of an encoder and a decoder, called bottom-up and top-down pathway here\cite{fpn}. Similarly to U-Net, feature maps at different scales with a scaling step of 2 are created in the encoder \cite{fpn}. In the decoder, the feature maps are upsampled and combined with the encoder information of the same level. Similarly to LinkNet, addition is used in the skip connections, but an 1x1 convolution is applied. By doing this so-called feature pyramids are build, containing features at different resolution. \citeauthor{kirillov2019panoptic} proposed a method to use these feature pyramids to obtain a segmentation by merging the feature maps using addition or concatenation \cite{kirillov2019panoptic, SegmentationModels}. The architecture is visualised in figure \ref{fig:fpn-architecture}.
-%\begin{itemize}
-%	\item top-down-pthway and lateral connections": "higher resolution features by upsampling spatially coarser, but semantically stronger, feature maps from higher pyramid levels", enhance with features from bottom-up pathway via lateral connections $\rightarrow$ merge feature maps of same spatial size from both pathways\cite{fpn}
-%	\item bottom-up feature map: lower-level sementatics but activations more accurately localized (fewer subsampling)\cite{fpn}
-%	\item creation of top-down feature maps: upsample and then merge\cite{fpn}
-%	\item final feature contains local and global context information\cite{fpn}
-%\end{itemize}
 
 \begin{figure}
 	\centering
@@ -65,15 +59,14 @@ The Feature Pyramid Network (FPN) architecture creates feature maps of various s
 
 \paragraph{PSPNet}
 
-\begin{itemize}
-	\item long for Pyramid Scene Parsing Network
-	\item feature map extracted with pretrained backbone
-	\item pyramid pooling to get context information
-	\item pyramid pooling: fusion of features under four different pyramid scales (global pooling and sub-regions for different locations), 1x1 convolution to maintain weight of global feature after each pyramid, upsampling of output to get same size as original feature map
-	\item "different levels of features concatenated as final pyramid pooling feature"
-	\item final prediction by convolution layer which input isoriginal feature map concatenated with pyramid pooling output
-	\item motivation: pyramid pooling provides levels of information, more helpful than global pooling
-\end{itemize}
+The main part of the Pyramid Scene Parsing Network (PSPNet) is the pyramid pooling module, visualised in part c of figure \ref{fig:pspnet-architecture}, which extracts context information at different scales. A feature map extracted with a pre-trained backbone is pooled at different pyramid scales. This means that global pooling and sub-regions on different locations are used to extract features from a global to a more fine-grained scale. Each of those scales is as passed through a 1x1 convolution and afterwards upsampled to the size of the original feature map. All feature maps including the original feature map from the backbone are concatenated and used to extract the final prediction. By this features on different scales are combined. \cite{Zhao2017, ArcGIS}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{fig/pspnet-architecture.png}
+	\caption{TODO. Originally created by \citeauthor{Zhao2017} \cite{Zhao2017}.}
+	\label{fig:pspnet-architecture}
+\end{figure}
 
 \subsubsection{Evaluation}
 
@@ -147,22 +140,9 @@ To make their models more robust, \citeauthor{Oota_2023_WACV} experiment with da
 
 \paragraph{Global-Local Architecture}
 
-\begin{itemize}
-	\item motivation: obtain global signals from entire image and local signals from smaller patches for details
-	\item only local might cause incomplete segmentation for large wounds
-	\item local architecture: split image in 16 non-overlapping patches (48x48x3), stacking results in 48x48x(3x16) volume
-	\item parallel 16 local models with shared weights
-	\item combined to full-size mask at end
-	\item stack output of global and local model to output of size (192x192x2)
-	\item 1x1 convolution to get final mask
-\end{itemize}
+The network architecture proposed by \citeauthor{Oota_2023_WACV} is called Global-Local architectures and consists of two segmentation models, a global model and a local model from which the result is combined for the final segmentation. The global model is a standard segmentation model of one of the 4 architectures described before in section \ref{sec:semantic-segmentation}. In the global model, the image (size 192x192x3) is split in 16 non-overlapping patches, resulting in a size of 48x48x3 per patch. The patches are than stacked, resulting in a size of 48x48x(3x16). The patches are the input to 16 local models in parallel, with shared weights between the local models. The output is eventually combined to obtain a full-sized mask. This mask and the output of the global model are concatenated to a mask of size 192x192x2 and a final convolution of size 1x1 results in the predicted mask. This architecture is motivated by the need to combine global signals from the entire image and local signals from smaller patches for more details. Only capturing local signals might cause an incomplete segmentation for large wounds. \cite{Oota_2023_WACV} % TODO: why use local
 
-% own judgement of method
-\begin{itemize}
-	\item interesting that they use segmentation models that already use methods to localize method, e.g. FPN already considers different context sizes
-	\item chosen patch size implies some property of the wound images, which size is important for local information
-	\item they stated in their paper that they tested different patch sizes and chose 48 because it lead to the best results
-\end{itemize}
+Although the combination of global and local signals sounds reasonable at first, it is interesting, that this approach is combined with segmentation models that already contain different context sizes and localisation in this context sizes, as describey in section \ref{sec:semantic-segmentation}. An explicitly chosen patch size implies some property of the wound images that makes this size particularly important for local information. \citeauthor{Oota_2023_WACV} stated in their paper that they tested different patch sizes and chose 48 because it lead to the best results \cite{Oota_2023_WACV}, supporting the theory that this patch size yields more information than others.
 
 
 \paragraph{Reported Results}

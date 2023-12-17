@@ -2,15 +2,11 @@
 
 \subsection{Code availability and reproduction of the results}
 
-Although the code for WSNET \cite{Oota_2023_WACV} is stated to be publicly available, a closer inspection of the linked GitHub repository shows, that this is only partially the case. A lack of documentations makes it hard to make use of the code, especially since the code seems to contain some errors.
+Although the code for WSNET \cite{Oota_2023_WACV} is stated to be publicly available, a closer inspection of the linked GitHub repository shows, that this is only partially the case. A lack of documentations makes it hard to make use of the code, especially since the code seems to contain multiple errors, making it only suitable as base for new code.
 
 In the scope of this project, the code was used to create runable models again. Unfortunately, the classes of the wounds are not available, which makes it impossible to perform pre-training as it was described in the original paper \cite{Oota_2023_WACV}. In total there are eight models available: A local model and a combined global-local model for each of the segmentation models Unet, PSPNet, FPN, and Linknet. The Python library used for the segmentation models is \texttt{segmentation\_models} \cite{SegmentationModels}. The implementation processed showed some differences to the described model architecture. In particular, it was claimed that the wound images were split up in parts of 48\,px times 48\,px. However, three of the four models, all beside PSPNet, only allow input sizes that are divisable by 32 and the GitHub showed a size of 64\,px was used. Another difference between available code and the paper is, that it is claimed that augmentation is not performed on the test images which is not the case in the available code.
 
-Information about the size of training, validation and test set is not given in the paper or code. In the scope of this project, a split of 70\,\% training, 15\,\% validation and 15\,\% test data is used.
-
-\begin{itemize}
-	\item train + validation set were just first x\,\% of dataset, not shuffled as one would normally do it
-\end{itemize}
+Information about the size of training, validation and test set is not given in the paper or code. However, the code reveals, that train and validation set wer just the first x\,\% of the dataset and no randomization was used to separate the test set as it is usually done. In the scope of this project, a split of 70\,\% training, 15\,\% validation and 15\,\% test data is used.
 
 Because the data training for the wound-specific pre-training is not available, the results can only be compared for imagenet pre-training.
 
@@ -33,7 +29,7 @@ Because the data training for the wound-specific pre-training is not available, 
 	\textbf{Global model} & 0.504 & 0.668 & 0.631 & 0.772 & 0.458 & 0.627 & 0.632 & 0.772 \\
 	\textbf{Global-Local model} & 0.495 & 0.658 & 0.618 & 0.763 & 0.476 & 0.642 & 0.612 & 0.758\\
 	\end{tabular}
-	\caption{IoUe-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture. The backbone used is mobilenet.}
+	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture. The backbone used is mobilenet.}
 \end{table}
 
 \begin{figure}[htb!]
@@ -50,4 +46,12 @@ Because the data training for the wound-specific pre-training is not available, 
 	\item most important thing: the global-local model does not improve about global model
 	\item TODO: explain here or later??
 	\item the results reported by \citeauthor{Oota_2023_WACV} are shown in figure
+\end{itemize}
+
+
+\subsection{Combination of different architectures}
+
+\begin{itemize}
+	\item used model architectures localize signals differently by design
+	\item if the patch size really does play a significant role, maybe it makes sense to combine different architecture sizes?
 \end{itemize}

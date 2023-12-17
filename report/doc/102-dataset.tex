@@ -1,17 +1,5 @@
-\section{Dataset}
+\section{Datasets}
 
-\subsection{Available Datasets}
-\begin{itemize}
-	\item not many medical datasets on chronic wounds publicly available \cite{Oota_2023_WACV}
-	\item often focus on specific type of chronic wounds - often diabetic or pressure ulcer
-	\item Example for such a dataset: data from Diabetic Foot Ulcer Challenge 2022 \cite{DFUC2022} $\rightarrow$ unfortunately only available after application, therefore not appropriate for this project with limited timescope
-	\item other dataset of Foot ulcer wounds is available as part of the Foot Ulcer Segmentation Challenge 2021 \cite{Wang2020}
-\end{itemize}
+Unfortunately, not many datasets on chronic wounds are publicly available \cite{Oota_2023_WACV}. Additionally, they often feature only a specific type of chronic wounds, often diabetic or pressure ulcer. An example for such a specialised dataset is the data from the Diabetic Foot Ulcer Challenge 2022 \cite{DFUC2022}. However, it is only available after application and therefor not appropriate for this project and its limited timescope. One other data set featuring foot ulcer wounds is publicly available as part of the Foot Ulcer Segmentation Challenge 2021 \cite{Wang2020}. It consists of 1010 images which are augmented to build a data set with a training set of 3645 images and a test set of 405 images. Due to the nature of a challenge, labels for the test set are not available.
 
-\subsection{WSNET Dataset}
-
-\begin{itemize}
-	\item used dataset consists of 2686 wound images with their corresponding masks introduced by \citeauthor{Oota_2023_WACV} \cite{Oota_2023_WACV}.
-	\item 8 different wound types represented in dataset: venous ulcer, trauma wound, diabetic ulcer, surgical wound, arterial ulcer, cellulitis, pressure ulcer and a not further specified group of other wounds
-	\item unfortunately, the wound classification is not available
-\end{itemize}
+\paragraph{WSNET data set} The data set mainly used in the scope of this project is the WSNET data set featuring eight different wound types: venous ulcer, trauma wound, diabetic ulcer, surgical wound, arterial ulcer, cellulitis, pressure ulcer and a not further specified group of other wounds \cite{Oota_2023_WACV, Oota_2021_WACV}. In total it consists of 2686 images and their corresponding masks. This means it consists of more individual images and wound types than the beforementioned publicly available data set. Unfortunately, the wound classification itself is not available. Furthermore, \citeauthor{Oota_2023_WACV} mention another seperate data set for pre-training with wound type classification which is not publicly available as well.
