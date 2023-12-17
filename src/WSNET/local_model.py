@@ -4,7 +4,7 @@ from segmentation_models import FPN, Linknet, PSPNet, Unet
 from src.WSNET.helper import CreatePatches, putconcate, putconcate_vert
 
 
-def create_local_model(segmentation_model, input_size=192):
+def create_local_model(segmentation_model, input_size=192, activation_function="sigmoid"):
     """
     :param segmentation_model: one of "fpn", "pspnet", "linknet", "unet"
     :param input_size: width and height of input images, inputs must be square image. Default is 192. Must be dividable
@@ -25,7 +25,7 @@ def create_local_model(segmentation_model, input_size=192):
             backbone_name="mobilenet",
             input_shape=(patch_size, patch_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model == "pspnet":
@@ -34,7 +34,7 @@ def create_local_model(segmentation_model, input_size=192):
             backbone_name="mobilenet",
             input_shape=(patch_size, patch_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model == "linknet":
@@ -44,7 +44,7 @@ def create_local_model(segmentation_model, input_size=192):
             backbone_name="mobilenet",
             input_shape=(patch_size, patch_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model == "unet":
@@ -54,7 +54,7 @@ def create_local_model(segmentation_model, input_size=192):
             backbone_name="mobilenet",
             input_shape=(patch_size, patch_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     else:

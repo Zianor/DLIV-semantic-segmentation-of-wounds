@@ -152,6 +152,7 @@ def split_train_test_validation():
     """
     data_dir, mask_dir = get_data_dirs(False)
     all_images = os.listdir(data_dir)
+    all_images = [image for image in all_images if image != ".gitkeep"]
 
     train_images, test_images = train_test_split(all_images, train_size=0.7, test_size=0.3, random_state=0)
     test_images, validation_images = train_test_split(

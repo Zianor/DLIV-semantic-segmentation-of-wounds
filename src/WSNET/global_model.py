@@ -2,10 +2,11 @@ import tensorflow as tf
 from segmentation_models import FPN, Linknet, PSPNet, Unet
 
 
-def create_global_model(segmentation_model, input_size=192):
+def create_global_model(segmentation_model, input_size=192, activation_function="sigmoid"):
     """
     :param segmentation_model: one of "fpn", "pspnet", "linknet", "unet"
     :param input_size: width and height of input images, inputs must be square image. Default is 192
+    :param activation_function: activation function used, default is sigmoid
     """
     input = tf.keras.Input(shape=(input_size, input_size, 3))
 
@@ -14,7 +15,7 @@ def create_global_model(segmentation_model, input_size=192):
             backbone_name="mobilenet",
             input_shape=(input_size, input_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model == "pspnet":
@@ -22,7 +23,7 @@ def create_global_model(segmentation_model, input_size=192):
             backbone_name="mobilenet",
             input_shape=(input_size, input_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model == "linknet":
@@ -30,7 +31,7 @@ def create_global_model(segmentation_model, input_size=192):
             backbone_name="mobilenet",
             input_shape=(input_size, input_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model == "unet":
@@ -38,7 +39,7 @@ def create_global_model(segmentation_model, input_size=192):
             backbone_name="mobilenet",
             input_shape=(input_size, input_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     else:

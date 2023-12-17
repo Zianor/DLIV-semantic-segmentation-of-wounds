@@ -5,13 +5,19 @@ import tensorflow as tf
 
 from src.helper import get_checkpoint_path
 from src.WSNET.global_local_model import create_global_local_model
+from src.WSNET.global_model import create_global_model
 from src.WSNET.helper import get_datasets, split_train_test_validation
 from src.WSNET.local_model import create_local_model
-from src.WSNET.global_model import create_global_model
 
 
 def train_model(
-    segmentation_model, model_architecture, input_size=192, load_only=True, batch_size=16, epochs=100
+    segmentation_model,
+    model_architecture,
+    input_size=192,
+    load_only=True,
+    batch_size=16,
+    epochs=100,
+    activation_function="sigmoid",
 ):
     """
     :param segmentation_model: one of "fpn", "pspnet", "linknet", "unet"
@@ -21,16 +27,22 @@ def train_model(
     :param load_only: if True, the model is loaded from weights, else it is trained
     :param batch_size: batch size, default is 16
     :param epochs: number of epochs, default 100
+    :param activation_function: activation function, default is sigmoid
     """
-    checkpoint_name = f"{segmentation_model}-{model_architecture}"
+    if activation_function == "sigmoid":
+        checkpoint_name = f"{segmentation_model}-{model_architecture}"
+    else:
+        checkpoint_name = f"{segmentation_model}-{model_architecture}-{activation_function}"
     two_inputs = False
     if model_architecture == "local":
-        model = create_local_model(segmentation_model, input_size)
+        model = create_local_model(segmentation_model, input_size, activation_function=activation_function)
     elif model_architecture == "global-local":
-        model = create_global_local_model(segmentation_model, input_size)
+        model = create_global_local_model(
+            segmentation_model, input_size, activation_function=activation_function
+        )
         two_inputs = True
     elif model_architecture == "global":
-        model = create_global_model(segmentation_model, input_size)
+        model = create_global_model(segmentation_model, input_size, activation_function=activation_function)
     else:
         raise ValueError('Parameter model_architecture must be one of "local", "global-local"')
 
