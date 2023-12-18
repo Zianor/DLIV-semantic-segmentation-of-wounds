@@ -8,7 +8,7 @@ from src.WSNET.global_local_model import create_global_local_model
 from src.WSNET.global_model import create_global_model
 from src.WSNET.helper import get_datasets, split_train_test_validation
 from src.WSNET.local_model import create_local_model
-from WSNET.global_local_model_mixed import create_global_local_model_mixed
+from src.WSNET.global_local_model_mixed import create_global_local_model_mixed
 
 
 def train_model(
