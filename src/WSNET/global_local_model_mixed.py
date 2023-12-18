@@ -36,7 +36,7 @@ def create_global_local_model_mixed(
             backbone_name="mobilenet",
             input_shape=(patch_size, patch_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model_local == "pspnet":
@@ -45,7 +45,7 @@ def create_global_local_model_mixed(
             backbone_name="mobilenet",
             input_shape=(patch_size, patch_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model_local == "linknet":
@@ -55,7 +55,7 @@ def create_global_local_model_mixed(
             backbone_name="mobilenet",
             input_shape=(patch_size, patch_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model_local == "unet":
@@ -65,7 +65,7 @@ def create_global_local_model_mixed(
             backbone_name="mobilenet",
             input_shape=(patch_size, patch_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     else:
@@ -79,7 +79,7 @@ def create_global_local_model_mixed(
             backbone_name="mobilenet",
             input_shape=(input_size, input_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model_global == "pspnet":
@@ -87,7 +87,7 @@ def create_global_local_model_mixed(
             backbone_name="mobilenet",
             input_shape=(input_size, input_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model_global == "linknet":
@@ -96,7 +96,7 @@ def create_global_local_model_mixed(
             backbone_name="mobilenet",
             input_shape=(input_size, input_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     elif segmentation_model_global == "unet":
@@ -104,7 +104,7 @@ def create_global_local_model_mixed(
             backbone_name="mobilenet",
             input_shape=(input_size, input_size, 3),
             classes=1,
-            activation="sigmoid",
+            activation=activation_function,
             encoder_freeze=False,
         )
     else:
@@ -130,7 +130,7 @@ def create_global_local_model_mixed(
     x_final = tf.keras.layers.Concatenate(axis=3)([x_patch, x_global_output])
 
     # final convolution of global and local output
-    x_final = tf.keras.layers.Conv2D(1, 1, activation="sigmoid")(x_final)
+    x_final = tf.keras.layers.Conv2D(1, 1, activation=activation_function)(x_final)
 
     model = tf.keras.models.Model(inputs=[local_input, global_input], outputs=x_final)
 

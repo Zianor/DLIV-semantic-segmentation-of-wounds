@@ -8,6 +8,7 @@ from src.WSNET.global_local_model import create_global_local_model
 from src.WSNET.global_model import create_global_model
 from src.WSNET.helper import get_datasets, split_train_test_validation
 from src.WSNET.local_model import create_local_model
+from WSNET.global_local_model_mixed import create_global_local_model_mixed
 
 
 def train_model(
@@ -20,7 +21,8 @@ def train_model(
     activation_function="sigmoid",
 ):
     """
-    :param segmentation_model: one of "fpn", "pspnet", "linknet", "unet"
+    :param segmentation_model: one of "fpn", "pspnet", "linknet", "unet", can be a tuple of (global_model, local_model)
+     for "global-local" architecture
     :param model_architecture: one of "local", "global-local"
     :param input_size: width and height of input images, inputs must be square image. Default is 192. Must be dividable
     by 48 and 64
@@ -29,18 +31,34 @@ def train_model(
     :param epochs: number of epochs, default 100
     :param activation_function: activation function, default is sigmoid
     """
-    if activation_function == "sigmoid":
-        checkpoint_name = f"{segmentation_model}-{model_architecture}"
+    if type(segmentation_model) == tuple and model_architecture != "global-local":
+        raise ValueError(
+            "Parameter segementation_model must be of type string if the model architecture is local or global"
+        )
+    if type(segmentation_model) == tuple:
+        segmentation_model_str = f"{segmentation_model[0]}-{segmentation_model[1]}"
     else:
-        checkpoint_name = f"{segmentation_model}-{model_architecture}-{activation_function}"
+        segmentation_model_str = segmentation_model
+    if activation_function == "sigmoid":
+        checkpoint_name = f"{segmentation_model_str}-{model_architecture}"
+    else:
+        checkpoint_name = f"{segmentation_model_str}-{model_architecture}-{activation_function}"
     two_inputs = False
     if model_architecture == "local":
         model = create_local_model(segmentation_model, input_size, activation_function=activation_function)
     elif model_architecture == "global-local":
-        model = create_global_local_model(
-            segmentation_model, input_size, activation_function=activation_function
-        )
         two_inputs = True
+        if type(segmentation_model) == str:
+            model = create_global_local_model(
+                segmentation_model, input_size, activation_function=activation_function
+            )
+        else:
+            model = create_global_local_model_mixed(
+                segmentation_model_global=segmentation_model[0],
+                segmentation_model_local=segmentation_model[1],
+                input_size=input_size,
+                activation_function=activation_function,
+            )
     elif model_architecture == "global":
         model = create_global_model(segmentation_model, input_size, activation_function=activation_function)
     else:
