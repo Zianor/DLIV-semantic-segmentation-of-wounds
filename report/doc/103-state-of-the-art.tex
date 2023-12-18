@@ -2,15 +2,15 @@
 
 \subsection{Semantic Segmentation}\label{sec:semantic-segmentation}
 
-The segmentation of wounds belongs to the class of semantic segmantation problems, where a pixel-wise classification is performed. In the case of wound segmentation there are two classes: foreground, which is the wound, and background. Deep Learning methods became dominant in the last years because they became more accessible. Fully Convolutional Neural Networks (fCNN) as a starting point in research had the drawback of resulting in a low output resolution and multiple techniques were invented to increase the output resolution \cite{Litjens2017}. This results in an encoder-decoder architecture as base for the networks, inspired by auto-encoders \cite{linknet}, where the encoder subsamples and the decoder upsamples \cite{Norelyaqine2023}. In such architectures the encoder generates context information, information in the feature space while the decoder maps this information into the spatial context.
+The segmentation of wounds belongs to the class of semantic segmentation problems, where a pixel-wise classification is performed. In the case of wound segmentation, there are two classes: foreground, which is the wound, and background. Deep Learning methods have become dominant in the last few years because they have become more accessible. Fully Convolutional Neural Networks (fCNN) as a starting point in research had the drawback of resulting in a low output resolution, and multiple techniques were invented to increase the output resolution \cite{Litjens2017}. This results in an encoder-decoder architecture as the base for the networks, inspired by auto-encoders \cite{LinkNet}, where the encoder subsamples and the decoder upsamples \cite{Norelyaqine2023}. In such architectures, the encoder generates context information, information in the feature space, while the decoder maps this information into the spatial context.
 
-Pre-training for such models requires a huge amount of data. A typical data set for such pre-training is the ImageNet object classification data set \cite{SegNet}.
+Pre-training for such models requires a vast amount of data. The typical object classification data set for such pre-training is the ImageNet data set \cite{SegNet}.
 
-In this project, four different segmentation models are used: U-Net, Linknet, FPN and PSPNet. All are improved architectures about a basic fCNN. Each architecture is described in detail to understand challenges and approaches of localizing information in space.
+This project uses four segmentation models:: U-Net, LinkNet, FPN and PSPNet. All are improved architectures about a basic fCNN. Each architecture is described in detail to understand the challenges and approaches to localising information in space.
 
 \paragraph{U-Net}
 
-U-Net is a convolutional network developed for Biomedical Image Segmentation, based on an encoder-decoder architecture. Encoder and decoder are called contracting and expansive path in the original paper, describing their function. They are also described as context path and spatial path \cite{MO2022626}. Both, encoder and decoder consist of different steps to encode and decode the image on different spatial levels. The encoder is a classical CNN; each step consists of two convolutions and a max pooling operation for downsampling. The decoder step upsamples the feature map followed by a convolution. The result is then concatenated with the corresponding feature map from the encdoer path and convolution is applied again. In the final layer, 1x1 convolution is used to map the feature vector to the desired number of classes. This architecture is visualised in figure \ref{fig:unet-architecture}. \cite{unet}
+U-Net is a convolutional network developed for biomedical image segmentation based on an encoder-decoder architecture. Encoder and decoder are called contracting and expansive paths in the original paper, describing their function. They are also described as context and spatial paths \cite{MO2022626}. Both the encoder and decoder consist of different steps to encode and decode the image on different spatial levels. The encoder is a classical CNN; each step consists of two convolutions and a max pooling operation for downsampling. The decoder step upsamples the feature map followed by a convolution. The result is then concatenated with the corresponding feature map from the encoder path, and convolution is applied again. In the final layer, 1x1 convolution maps the feature vector to the desired number of classes. This architecture is visualised in Figure \ref{fig:unet-architecture}. \cite{unet}
 
 \begin{figure}[htb!]
 	\centering
@@ -19,20 +19,20 @@ U-Net is a convolutional network developed for Biomedical Image Segmentation, ba
 	\label{fig:unet-architecture}
 \end{figure}
 
-The skip connections, connecting the different levels of encoder and decoder prevent a loss of information and extracting the features at different resolutions to retrieve spatial information. By doing this, it is one of the first architectures improving the classical fCNN for semantic segmantation \cite{Litjens2017}. While U-Net provides spatial localization of features, its ability to generalize to multi-scale information is limited \cite{Norelyaqine2023}.
+The skip connections, connecting the different levels of encoder and decoder prevent a loss of information and extract the features at different resolutions to retrieve spatial information. By doing this, it is one of the first architectures to improve the classical fCNN for semantic segmentation \cite{Litjens2017}. While U-Net provides spatial localisation of features, its ability to generalise to multi-scale information is limited \cite{Norelyaqine2023}.
 
-One restriction is, that the input size must be chosen such that all 2x2 max-pooling operations in the encoder are applied to an even x and y size.
+One restriction is that the input size must be chosen to apply all 2x2 max-pooling operations in the encoder to an even x and y size.
 
 
-\paragraph{Linknet}
+\paragraph{LinkNet}
 
-Similar to U-Net, Linknet contains of an encoder block for downsampling and a decoder block for upsampling. The downsampling is not done by max pooling as it is in the U-Net architecture but by using a stride of 2 in a convolutional layer. Also does the inital encoder block differ from the following blocks as it uses a larger kernel and uses max pooling. The decoder blocks upsample by a factor of 2 in each block. The final block differs again from the previous blocks. The main difference to the U-Net architecture is how the skip connections are used: Similarly to the U-Net, there are skip connections between the corresponding steps of encoder and decoder, but the feature map from the encoder is not concatenated but added to decoder data. The linknet architecture is visualised in figure \ref{fig:linknet-architecture}. \cite{linknet}
+Like U-Net, LinkNet consists of an encoder block for downsampling and a decoder block for upsampling. The downsampling is not done by max pooling as in the U-Net architecture but by using a stride of 2 in a convolutional layer. The initial encoder block also differs from the following blocks as it uses a larger kernel and max pooling. The decoder blocks upsample by a factor of 2 in each block. The final block differs again from the previous blocks. The main difference to the U-Net architecture is how the skip connections are used: Similarly to the U-Net, there are skip connections between the corresponding steps of the encoder and decoder, but the feature map from the encoder is not concatenated but added to decoder data. The LinkNet architecture is visualised in Figure \ref{fig:LinkNet-architecture}. \cite{LinkNet}
 
 \begin{figure}[htb!]
 	\centering
-	\includegraphics[width=0.5\textwidth]{fig/linknet-architecture.png}
+	\includegraphics[width=0.5\textwidth]{fig/LinkNet-architecture.png}
 	\caption{A visualisation of the LinkNet architecture originally provided by \citeauthor{SegmentationModels} \cite{SegmentationModels}.}
-	\label{fig:linknet-architecture}
+	\label{fig:LinkNet-architecture}
 \end{figure}
 
 
@@ -41,13 +41,13 @@ Similar to U-Net, Linknet contains of an encoder block for downsampling and a de
 %	\item "directly connects shallow feature map in encoder module to the decoder module of the corresponding size" $\rightarrow$ accurate position information on shallow layer, avoids redundant parameters and computations \cite{Norelyaqine2023}
 %\end{itemize}
 
-The implementation used in this project has four skip connections instead of the original three \cite{SegmentationModels}. Similarly to the U-Net, the input size is restricted such that every upsampling operations need to be applied to an even x and y size.
+The implementation used in this project has four skip connections instead of the original three \cite{SegmentationModels}. Similarly to the U-Net, the input size is restricted, so that every upsampling operation can be applied to an even x and y size.
 
-Linknet has been shown to achieve better results than U-Net under similar conditions \cite{Gao2022}.
+LinkNet has been shown to achieve better results than U-Net under similar conditions \cite{Gao2022}.
 
 \paragraph{FPN}
 
-The Feature Pyramid Network (FPN) architecture creates feature maps of various sizes in multiple layers \cite{Norelyaqine2023}. Similar to the other architectures in consists of an encoder and a decoder, called bottom-up and top-down pathway here\cite{fpn}. Similarly to U-Net, feature maps at different scales with a scaling step of 2 are created in the encoder \cite{fpn}. In the decoder, the feature maps are upsampled and combined with the encoder information of the same level. Similarly to LinkNet, addition is used in the skip connections, but an 1x1 convolution is applied. By doing this so-called feature pyramids are build, containing features at different resolution. \citeauthor{kirillov2019panoptic} proposed a method to use these feature pyramids to obtain a segmentation by merging the feature maps using addition or concatenation \cite{kirillov2019panoptic, SegmentationModels}. The architecture is visualised in figure \ref{fig:fpn-architecture}.
+The Feature Pyramid Network (FPN) architecture creates feature maps of various sizes in multiple layers \cite{Norelyaqine2023}. Like the other architectures, it consists of an encoder and a decoder, called bottom-up and top-down pathways here\cite{fpn}. Similarly to U-Net, feature maps at different scales with a scaling step of 2 are created in the encoder \cite{fpn}. In the decoder, the feature maps are upsampled and combined with the encoder information of the same level. Similarly to LinkNet, addition is used in the skip connections, but a 1x1 convolution is applied. By doing this, so-called feature pyramids are built, containing features at different resolutions. \citeauthor{kirillov2019panoptic} proposed using these feature pyramids to obtain a segmentation by merging the feature maps using addition or concatenation \cite{kirillov2019panoptic, SegmentationModels}. The architecture is visualised in Figure \ref{fig:fpn-architecture}.
 
 \begin{figure}[htb!]
 	\centering
@@ -59,7 +59,7 @@ The Feature Pyramid Network (FPN) architecture creates feature maps of various s
 
 \paragraph{PSPNet}
 
-The main part of the Pyramid Scene Parsing Network (PSPNet) is the pyramid pooling module, visualised in part c of figure \ref{fig:pspnet-architecture}, which extracts context information at different scales. A feature map extracted with a pre-trained backbone is pooled at different pyramid scales. This means that global pooling and sub-regions on different locations are used to extract features from a global to a more fine-grained scale. Each of those scales is as passed through a 1x1 convolution and afterwards upsampled to the size of the original feature map. All feature maps including the original feature map from the backbone are concatenated and used to extract the final prediction. By this features on different scales are combined. \cite{Zhao2017, ArcGIS}
+The central part of the Pyramid Scene Parsing Network (PSPNet) is the pyramid pooling module, visualised in part c of Figure \ref{fig:pspnet-architecture}, which extracts context information at different scales. A feature map extracted with a pre-trained backbone is pooled at different pyramid scales. This means that global pooling and sub-regions on different locations are used to extract features from a global to a more fine-grained scale. Each of those scales is passed through a 1x1 convolution and afterwards upsampled to the size of the original feature map. All feature maps, including the original feature map from the backbone, are concatenated and used to extract the final prediction. By this, features on different scales are combined. \cite{Zhao2017, ArcGIS}
 
 \begin{figure}[htb!]
 	\centering
@@ -68,13 +68,13 @@ The main part of the Pyramid Scene Parsing Network (PSPNet) is the pyramid pooli
 	\label{fig:pspnet-architecture}
 \end{figure}
 
-\subsubsection{Optimization and Evaluation}
+\subsubsection{Optimisation and Evaluation}
 
-There exist several methods to evaluate how good a predicted segmentation is. Since semantic segmentation performs a pixel-wise classification, resulting in a segmentation mask, classical metrics such as accuracy and precision are available. Two performance metrics that are commonly used in semantic segmentation in medical imaging are the Dice Coefficient and the Intersetcion over Union (IoU) score. They indicate the segmentation quality better than pixel-wise accuracy \cite{Eelbode}.
+Several methods exist to evaluate how good a predicted segmentation is. Since semantic segmentation performs a pixel-wise classification, resulting in a segmentation mask, classical metrics such as accuracy and precision are available. Two performance metrics commonly used in semantic segmentation in medical imaging are the Dice Coefficient and the Intersection over Union (IoU) score. They indicate the segmentation quality better than pixel-wise accuracy \cite{Eelbode}.
 
 \paragraph{IoU-Score}
 
-The IoU-Score (Intersection over Union), also known as the Jaccard index $J$ describes the ratio between the intersection of the ground truth mask $y$ and the predicted mask $\tilde{y}$ and the union of the predicted and the ground truth mask. By this it compares the similarity of the two masks \cite{Cho2021WeightedIO}.
+The IoU-Score (Intersection over Union), also known as the Jaccard index $J$, describes the ratio between the intersection of the ground truth mask $y$ and the predicted mask $\tilde{y}$ and the union of the predicted and the ground truth mask. This compares the similarity of the two masks \cite{Cho2021WeightedIO}.
 
 \begin{align}
 	\text{IoU}(y, \tilde{y} :&= \frac{\text{Area of overlap}}{\text{Area of union}}\\
@@ -84,32 +84,32 @@ The IoU-Score (Intersection over Union), also known as the Jaccard index $J$ des
 
 \paragraph{Dice Coefficient}
 
-The Dice coefficient is the F1 score calclulated for the image masks. In terms of intersection and union, this means it calculates the ratio between two times the overlap between ground truth $y$ and predicted mask $\tilde{y}$ and the total area.
+The Dice coefficient is the F1 score calculated for the image masks. Regarding intersection and union, it calculates the ratio between two times the overlap between ground truth $y$ and predicted mask $\tilde{y}$ and the total area.
 
 \begin{align}
 	\text{Dice}(y, \tilde{y}) :&= 2 \cdot \frac{\text{Area of overlap}}{\text{Total area}}\\
 	&= 2 \cdot \frac{|y \cap \tilde{y}|}{|y| + |\tilde{y}|}
 \end{align}
 
-To gain more insight into the type of the errors the model makes, the rate of false positives and false negatives can be used do differentiate Type I and Type II errors \cite{DFUC2022}.
+To gain more insight into the type of errors the model makes, the rate of false positives and false negatives can be reported and then used to differentiate Type I and Type II errors \cite{DFUC2022}.
 
 % "The difference between the two metrics is that the IoU penalizes under- and over-segmentation more than DSC"
 
 \paragraph{Loss function}
 
-Although Dice Coefficient and IOU-Score are the most commonly used evaluation metrics, pixel-wise cross-entropy is often used as a loss function \cite{Eelbode}. Since it is shown that there is no direct link between pixel-wise cross-entropy, either weighted or not, and Dice Coefficient and IoU-Score, this choice does not make sense because it does not optimize towards the goal.
+Although the Dice Coefficient and IOU-Score are the most commonly used evaluation metrics, pixel-wise cross-entropy is often used as a loss function \cite{Eelbode}. Since it is shown that there is no direct link between pixel-wise cross-entropy, either weighted or not, and Dice Coefficient and IoU-Score, this choice does not make sense because it does not optimise towards the goal.
 
-There exist differentiable approximations for Dice Coefficient and IoU-Score that can be used to perform more goal-orientated optimization. Both metrics and loss functions are shown to be linked to each other \cite{Eelbode}.
+Differentiable approximations for Dice Coefficient and IoU-Score exist that can be used to perform more goal-orientated optimisation. Both metrics and loss functions are shown to be linked to each other \cite{Eelbode}.
 
 % DiceLoss is used in the code
 
 \subsubsection{Data Augmentation}
 
-Data Augmentation is a useful technique to make trained models more robust and accurate. This is especially the case if available data is limited, as the data set size can be either increased or the data set can be made more diverse.
+Data Augmentation is a valuable technique to make trained models more robust and accurate. This is especially true if available data is limited, as the data set size can be increased or the data set can be made more diverse.
 
-For images, there exist several different possible augmentations. First of all, there are different positional augmentations, including cropping, flipping, rotating and resizing the image. Another class of augmentations are color augmentations, changing the brightness, contrast and saturation of the image. Other augmentations include blurring and dropouts.
+For images, there exist several different possible augmentations. First, there are different positional augmentations, including cropping, flipping, rotating and resizing the image. Another class of augmentations is colour augmentation, which changes the image's brightness, contrast or saturation. Other augmentations include blurring and dropouts.
 
-Not every augmentation is appropriate for every application. Rotating images of standing animals by 180 degrees for example would not make sense, while rotating images of wounds is appropriate. Therefore, augmentations must be chosen carefully depending on the application.
+Not every augmentation is appropriate for every application. Rotating images of standing animals by 180 degrees, for example, would not make sense, while the rotation of wound images is appropriate. Therefore, augmentations must be chosen carefully depending on the application.
 
 
 % https://nanonets.com/blog/data-augmentation-how-to-use-deep-learning-when-you-have-limited-data-part-2/
@@ -119,37 +119,37 @@ Not every augmentation is appropriate for every application. Rotating images of 
 \subsection{Wound Segmentation}
 
 
-As already discussed in the motivation of this project, wound segmentation is a complex problem due to wound characteristics such as different tissues and therefore edges in a wound itself on one side and technical reasons such as e.g. varying lightning, distance to the wound and different angles. 
+As already discussed in the motivation of this project, wound segmentation is a complex problem due to wound characteristics such as different tissues and, therefore, edges inside of a wound itself on one side and technical reasons such as, e.g. varying lightning, distance to the wound and different angles. 
 
-Before Deep Learning became easily accessible and popular, methods based on features describing color and textures, region growing and optimal thresholding algorithms and classical machine learning models were used to perform segmentation \cite{Scebba2022}. Convolutional Neural Networks replaced manually extracted features by autonomously learned ones \cite{Scebba2022}. Some methods included pre-processing steps to remove the background by e.g. user interaction indicating the background, using a standardized background when taking the image or using manual feature engineering to detect the background more efficiently and make the wound segmentation task easier. Such non-automatic steps limit the use of the segmentation algorithms because they either require more ressources in the image taking process, in the segmentation process or are specifically tailored for specific conditions of lighting or camera settings.
+Before Deep Learning became easily accessible and popular, methods based on features describing colour and textures, region-growing with optimal thresholding algorithms, and classical machine learning models were used to perform segmentation \cite{Scebba2022}. Convolutional Neural Networks replaced manually extracted features with autonomously learned ones \cite{Scebba2022}. Some methods included pre-processing steps to remove the background by, e.g., user interaction indicating the background, using a standardized background when taking the image, or using manual feature engineering to detect the background more efficiently and make the wound segmentation task easier. Such non-automatic steps limit the use of the segmentation algorithms because they either require more resources in the image-taking process or the segmentation process or are specifically tailored for specific lighting conditions or camera settings.
 
-The Diabetic Foot Ulcer Challenge 2022 used FCN, U-Net and SegNet with different backbones and categorical cross-entropy loss as baseline for their challenge, indicating those methods reflect the current state of the art that needs to be improved \cite{DFUC2022}. Generally, such classic models are commonly used and extended with minor adaptions. Two methods stood out in the performed literature review, including more sophisticated adaptions.
+The Diabetic Foot Ulcer Challenge 2022 used FCN, U-Net and SegNet with different backbones and categorical cross-entropy loss as the baseline for their challenge, indicating those methods reflect the current state of the art that needs to be improved \cite{DFUC2022}. Generally, such classic models are commonly used and extended with minor adaptions. Two methods stood out in the performed literature review, including more sophisticated adaptions.
 
-\citeauthor{Scebba2022} proposed a method consisting of two steps: An object detection step that produces bounding boxes containing the wounds and a second step that performs segmentation on those areas. Segmentation itself is performed using classical architectures for semantic segmentation as described in section \ref{sec:semantic-segmentation}. The loss function used was pixel-wise weighted binary cross entropy loss. Weighting was calculated based on the number of wound and background pixels of each training set fold.
+\citeauthor{Scebba2022} proposed a method consisting of two steps: An object detection step that produces bounding boxes containing the wounds and a second step that performs segmentation on those areas. Segmentation is performed using classical architectures for semantic segmentation, as described in section \ref{sec:semantic-segmentation}. The loss function used was a pixel-wise weighted binary cross-entropy loss. Weighting was calculated based on the number of wound pixels and background pixels of each training set fold.
 %TODO: make say why i did not consider this approach
 
-\citeauthor{Oota_2023_WACV} claim they set a new state of the art for wound segmentation while providing a data set together with their work \cite{Oota_2023_WACV}. The latter made them a suitable method for further investigation in the scope of this project. Their approach is described in more detail in the following section.
+\citeauthor{Oota_2023_WACV} claim they set a new state of the art for wound segmentation while providing a data set together with their work \cite{Oota_2023_WACV}. The latter made them a suitable method for further investigation in this project's scope. Their approach is described in more detail in the following section.
 
-\subsubsection{WSNET}
+\subsubsection{WSNet}
 
-The framework proposed by \citeauthor{Oota_2023_WACV} uses the four before described segmentation architectures: U-Net, LinkNet, PSPNet and FPN. Experiments with different backbones were performed in their work, but in the scope of this project mainly MobileNet \cite{howard2017mobilenets} is used since it is the smallest one which allows faster training which is needed in the limited time of the project.
+The framework proposed by \citeauthor{Oota_2023_WACV} uses the previously described segmentation architectures: U-Net, LinkNet, PSPNet, and FPN. Experiments with different backbones were performed in their work. However, in this project's scope, MobileNet \cite{howard2017mobilenets} is mainly used since it is the smallest one, which allows faster training, which is needed in the limited time of the project.
 
-ImageNet pre-trained weights are used. WSNET also describes pre-training specific to wounds, called Wound-Domain Adaptive Pretraining. During this pre-training wound images are classified into five different ulcer types.
+ImageNet pre-trained weights are used. WSNet also describes pre-training specific to wounds, called Wound-Domain Adaptive Pre-training. During this pre-training, wound images are classified into five different ulcer types.
 
-To make their models more robust, \citeauthor{Oota_2023_WACV} experiment with data augmentiton on the training data and the corresponding masks including optical distortion, horizontal flip, random rotation, blur and more.
+\citeauthor{Oota_2023_WACV} experimented with data augmentation on the training data and the corresponding masks, including optical distortion, horizontal flip, random rotation, blur, and more, to make their models more robust.
 
 \paragraph{Global-Local Architecture}
 
-The network architecture proposed by \citeauthor{Oota_2023_WACV} is called Global-Local architectures and consists of two segmentation models, a global model and a local model from which the result is combined for the final segmentation. The global model is a standard segmentation model of one of the 4 architectures described before in section \ref{sec:semantic-segmentation}. In the global model, the image (size 192x192x3) is split in 16 non-overlapping patches, resulting in a size of 48x48x3 per patch. The patches are than stacked, resulting in a size of 48x48x(3x16). The patches are the input to 16 local models in parallel, with shared weights between the local models. The output is eventually combined to obtain a full-sized mask. This mask and the output of the global model are concatenated to a mask of size 192x192x2 and a final convolution of size 1x1 results in the predicted mask. This architecture is motivated by the need to combine global signals from the entire image and local signals from smaller patches for more details. Only capturing local signals might cause an incomplete segmentation for large wounds. \cite{Oota_2023_WACV} % TODO: why use local
+The network architecture proposed by \citeauthor{Oota_2023_WACV} is called Global-Local architecture. It consists of two segmentation models, a global model and a local model, combining the result for the final segmentation. The global model is a standard segmentation model of one of the four architectures described in section \ref{sec:semantic-segmentation}. In the global model, the image (size 192x192x3) is split into 16 non-overlapping patches, resulting in a size of 48x48x3 per patch. The patches are then stacked, resulting in a size of 48x48x(3x16). The patches are the input to 16 local models in parallel, with shared weights between the local models. The output is eventually combined to obtain a full-sized mask. This mask and the output of the global model are concatenated to a mask of size 192x192x2, and a final convolution of size 1x1 results in the predicted mask. This architecture is motivated by the need to combine global signals from the entire image and local signals from smaller patches for more details. Only capturing local signals might cause an incomplete segmentation for large wounds. \cite{Oota_2023_WACV} % TODO: why use local
 
-Although the combination of global and local signals sounds reasonable at first, it is interesting, that this approach is combined with segmentation models that already contain different context sizes and localisation in this context sizes, as describey in section \ref{sec:semantic-segmentation}. An explicitly chosen patch size implies some property of the wound images that makes this size particularly important for local information. \citeauthor{Oota_2023_WACV} stated in their paper that they tested different patch sizes and chose 48 because it lead to the best results \cite{Oota_2023_WACV}, supporting the theory that this patch size yields more information than others.
+Although the combination of global and local signals sounds reasonable initially, it is interesting that this approach is combined with segmentation models that already contain different context sizes and localisation in these context sizes, as described in section \ref{sec:semantic-segmentation}. An explicitly chosen patch size implies some property of the wound images that makes this size particularly important for local information. \citeauthor{Oota_2023_WACV} stated in their paper that they tested different patch sizes and chose 48 because it led to the best results \cite{Oota_2023_WACV}, supporting the theory that this patch size yields more information than others.
 
 
 \paragraph{Reported Results}
 
-\citeauthor{Oota_2023_WACV} report that wound-specific pretraining improves the resulting segmentation. Furthermore, they find that data augmentation leads to improvements. As expected, the local-only models perform significantly worse than using the segmentation model as intended in a global way. Furthermore, they find thate the combination of global and local model leads to an improved performence compared to the global models. This indicates that the chosen patchsize yields information useful for the segmentation. The best results are therefore achived with wound-specific pre-training, data augmentation and the invented Global-local architecture.
+\citeauthor{Oota_2023_WACV} report that wound-specific pre-training improves the resulting segmentation. Furthermore, they find that data augmentation leads to improvements. As expected, the local-only models perform significantly worse than using the segmentation model as intended in a global way. Furthermore, they find that combining global and local models leads to an improved performance compared to the global models. This indicates that the chosen patch size yields valuable information for the segmentation. The best results are therefore achieved with wound-specific pre-training, data augmentation and the invented Global-Local architecture.
 
-Reporting such results always leads to the question whether they are reproducible. This is especially the case with the Global-local architecture with a specific patch size, leading to the question if the patch size can be generalized to other images sizes and other data sets.
+Reporting such results always leads to the question of whether they are reproducible. This is especially the case with the Global-Local architecture with a specific patch size, leading to questioning whether the patch size can be generalised to other image sizes and other data sets.
 
 
 
