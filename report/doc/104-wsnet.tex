@@ -1,5 +1,8 @@
 \section{WSNET}
 
+TODO: write introduction
+wanted to check results, first implement them, check for deviations, make experiments, look at explainability (maybe)
+
 \subsection{Code availability and reproduction of the results}
 
 Although the code for WSNET \cite{Oota_2023_WACV} is stated to be publicly available, a closer inspection of the linked GitHub repository shows, that this is only partially the case. A lack of documentations makes it hard to make use of the code, especially since the code seems to contain multiple errors, making it only suitable as base for new code.
@@ -12,7 +15,7 @@ Because the data training for the wound-specific pre-training is not available, 
 
 
 \begin{itemize}
-	\item problem with imagenet pretraining: input size for patches is not available, instead the default size of 224 is used, which might impact results negatively
+	\item problem with imagenet pretraining with mobilenet: input size for patches is not available, instead the default size of 224 is used, which might impact results negatively
 \end{itemize}
 
 
@@ -32,22 +35,30 @@ Because the data training for the wound-specific pre-training is not available, 
 	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture. The backbone used is mobilenet.}
 \end{table}
 
-\begin{figure}[htb!]
+\begin{table}[htb!]
 	\centering
 	\includegraphics[width=\textwidth]{fig/wsnet-results.png}
 	\caption{Results reported by \citeauthor{Oota_2023_WACV} \cite{Oota_2023_WACV}.}
-\end{figure}
+\end{table}
 
 \begin{itemize}
 	\item results are comparable with results reported in paper, slightly lower scores
 	\item e.g. Unet IoU score 0.495 with my code, 0.620 in paper (dice score 0.761 vs 0.658)
 	\item others are closer (linknet 0.618 from me vs 0.621 in paper, dice 0.763 in paper and for me)
 	\item maybe differences in training size
-	\item most important thing: the global-local model does not improve about global model
-	\item TODO: explain here or later??
+	\item most important thing: the global-local model does not improve about global model (or at least less than reported in paper)
+	\item but they are still way more computationally expensive because you need to train two models instead of one
+	\item as discussed before, an improvement indicates that something is going on with 48\,px context size
 	\item the results reported by \citeauthor{Oota_2023_WACV} are shown in figure
 \end{itemize}
 
+\subsection{Experiments with the activation function}
+
+\begin{itemize}
+	\item code shows use of sigmoid as activation function
+	\item literature of the model reports ReLU more frequently, thus it was tested as alternative to sigmoid
+	\item no clear trend of one being clearly better for all models and architectures
+\end{itemize}
 
 \subsection{Combination of different architectures}
 

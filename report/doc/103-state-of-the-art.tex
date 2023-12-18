@@ -28,7 +28,7 @@ One restriction is, that the input size must be chosen such that all 2x2 max-poo
 
 Similar to U-Net, Linknet contains of an encoder block for downsampling and a decoder block for upsampling. The downsampling is not done by max pooling as it is in the U-Net architecture but by using a stride of 2 in a convolutional layer. Also does the inital encoder block differ from the following blocks as it uses a larger kernel and uses max pooling. The decoder blocks upsample by a factor of 2 in each block. The final block differs again from the previous blocks. The main difference to the U-Net architecture is how the skip connections are used: Similarly to the U-Net, there are skip connections between the corresponding steps of encoder and decoder, but the feature map from the encoder is not concatenated but added to decoder data. The linknet architecture is visualised in figure \ref{fig:linknet-architecture}. \cite{linknet}
 
-\begin{figure}
+\begin{figure}[htb!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{fig/linknet-architecture.png}
 	\caption{A visualisation of the LinkNet architecture originally provided by \citeauthor{SegmentationModels} \cite{SegmentationModels}.}
@@ -49,7 +49,7 @@ Linknet has been shown to achieve better results than U-Net under similar condit
 
 The Feature Pyramid Network (FPN) architecture creates feature maps of various sizes in multiple layers \cite{Norelyaqine2023}. Similar to the other architectures in consists of an encoder and a decoder, called bottom-up and top-down pathway here\cite{fpn}. Similarly to U-Net, feature maps at different scales with a scaling step of 2 are created in the encoder \cite{fpn}. In the decoder, the feature maps are upsampled and combined with the encoder information of the same level. Similarly to LinkNet, addition is used in the skip connections, but an 1x1 convolution is applied. By doing this so-called feature pyramids are build, containing features at different resolution. \citeauthor{kirillov2019panoptic} proposed a method to use these feature pyramids to obtain a segmentation by merging the feature maps using addition or concatenation \cite{kirillov2019panoptic, SegmentationModels}. The architecture is visualised in figure \ref{fig:fpn-architecture}.
 
-\begin{figure}
+\begin{figure}[htb!]
 	\centering
 	\includegraphics[width=0.6\textwidth]{fig/fpn-architecture.png}
 	\caption{A visualisation of the FPN architecture originally provided by \citeauthor{SegmentationModels} \cite{SegmentationModels}. Note, that the feature maps can combined either by concatenation or addition.}
@@ -61,18 +61,18 @@ The Feature Pyramid Network (FPN) architecture creates feature maps of various s
 
 The main part of the Pyramid Scene Parsing Network (PSPNet) is the pyramid pooling module, visualised in part c of figure \ref{fig:pspnet-architecture}, which extracts context information at different scales. A feature map extracted with a pre-trained backbone is pooled at different pyramid scales. This means that global pooling and sub-regions on different locations are used to extract features from a global to a more fine-grained scale. Each of those scales is as passed through a 1x1 convolution and afterwards upsampled to the size of the original feature map. All feature maps including the original feature map from the backbone are concatenated and used to extract the final prediction. By this features on different scales are combined. \cite{Zhao2017, ArcGIS}
 
-\begin{figure}
+\begin{figure}[htb!]
 	\centering
 	\includegraphics[width=\textwidth]{fig/pspnet-architecture.png}
-	\caption{TODO. Originally created by \citeauthor{Zhao2017} \cite{Zhao2017}.}
+	\caption{Visualization of the PSPNet-architecture. Originally created by \citeauthor{Zhao2017} \cite{Zhao2017}.}
 	\label{fig:pspnet-architecture}
 \end{figure}
 
-\subsubsection{Evaluation}
+\subsubsection{Optimization and Evaluation}
 
 There exist several methods to evaluate how good a predicted segmentation is. Since semantic segmentation performs a pixel-wise classification, resulting in a segmentation mask, classical metrics such as accuracy and precision are available. Two performance metrics that are commonly used in semantic segmentation in medical imaging are the Dice Coefficient and the Intersetcion over Union (IoU) score. They indicate the segmentation quality better than pixel-wise accuracy \cite{Eelbode}.
 
-\paragraph{IOUScore}
+\paragraph{IoU-Score}
 
 The IoU-Score (Intersection over Union), also known as the Jaccard index $J$ describes the ratio between the intersection of the ground truth mask $y$ and the predicted mask $\tilde{y}$ and the union of the predicted and the ground truth mask. By this it compares the similarity of the two masks \cite{Cho2021WeightedIO}.
 
@@ -95,11 +95,11 @@ To gain more insight into the type of the errors the model makes, the rate of fa
 
 % "The difference between the two metrics is that the IoU penalizes under- and over-segmentation more than DSC"
 
-\subsubsection{Loss function}
+\paragraph{Loss function}
 
-\begin{itemize}
-	\item loss function often uses pixel-wise (weighted) cross-entropy loss even though differentiable approximations of the two metrics exist \cite{Eelbode}
-\end{itemize}
+Although Dice Coefficient and IOU-Score are the most commonly used evaluation metrics, pixel-wise cross-entropy is often used as a loss function \cite{Eelbode}. Since it is shown that there is no direct link between pixel-wise cross-entropy, either weighted or not, and Dice Coefficient and IoU-Score, this choice does not make sense because it does not optimize towards the goal.
+
+There exist differentiable approximations for Dice Coefficient and IoU-Score that can be used to perform more goal-orientated optimization. Both metrics and loss functions are shown to be linked to each other \cite{Eelbode}.
 
 % DiceLoss is used in the code
 
@@ -147,12 +147,9 @@ Although the combination of global and local signals sounds reasonable at first,
 
 \paragraph{Reported Results}
 
-\begin{itemize}
-	\item pretraining on wound images improves results
-	\item data augmentation leads to improvements
-	\item local only models significantly worse than global model
-	\item global only models worse than global-local model
-\end{itemize}
+\citeauthor{Oota_2023_WACV} report that wound-specific pretraining improves the resulting segmentation. Furthermore, they find that data augmentation leads to improvements. As expected, the local-only models perform significantly worse than using the segmentation model as intended in a global way. Furthermore, they find thate the combination of global and local model leads to an improved performence compared to the global models. This indicates that the chosen patchsize yields information useful for the segmentation. The best results are therefore achived with wound-specific pre-training, data augmentation and the invented Global-local architecture.
+
+Reporting such results always leads to the question whether they are reproducible. This is especially the case with the Global-local architecture with a specific patch size, leading to the question if the patch size can be generalized to other images sizes and other data sets.
 
 
 
