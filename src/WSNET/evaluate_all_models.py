@@ -39,6 +39,7 @@ if __name__ == "__main__":
     batch_size = 16
     segmentation_models = ["unet", "linknet", "pspnet", "fpn"]
     model_architectures = ["local", "global", "global-local"]
+    activation_functions = ["sigmoid", "relu"]
     markdown_lines = []
     for model_architecture in model_architectures:
         markdown_lines.append(f"# {get_architecture_title(model_architecture)}")
@@ -46,14 +47,20 @@ if __name__ == "__main__":
         for segmentation_model in segmentation_models:
             markdown_lines.append(f"### {get_segmentation_model_title(segmentation_model)}")
             markdown_lines.append("")
-            model, train_gen, val_gen, test_gen = train_model(
-                segmentation_model=segmentation_model, model_architecture=model_architecture, load_only=True
-            )
-            results = model.evaluate(test_gen, steps=ceil(float(test_images_count) / float(batch_size)))
-            results_dict = dict(zip(model.metrics_names, results))
-            markdown_lines.append(create_markdown_table_str_for_metrics(results_dict))
-            print(f"Model {segmentation_model} {model_architecture}")
-            print(", ".join(f"{key}: {value:.3f}" for key, value in results_dict.items()))
+            for activation_function in activation_functions:
+                markdown_lines.append(f"##### {activation_function.title()}")
+                markdown_lines.append("")
+                model, train_gen, val_gen, test_gen = train_model(
+                    segmentation_model=segmentation_model,
+                    model_architecture=model_architecture,
+                    load_only=True,
+                    activation_function=activation_function,
+                )
+                results = model.evaluate(test_gen, steps=ceil(float(test_images_count) / float(batch_size)))
+                results_dict = dict(zip(model.metrics_names, results))
+                markdown_lines.append(create_markdown_table_str_for_metrics(results_dict))
+                print(f"Model {segmentation_model} {model_architecture} {activation_function}")
+                print(", ".join(f"{key}: {value:.3f}" for key, value in results_dict.items()))
         print("-----")
 
     with open("evaluation_results.md", "w") as writer:
