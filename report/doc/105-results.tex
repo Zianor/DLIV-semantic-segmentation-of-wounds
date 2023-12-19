@@ -8,8 +8,10 @@ The first contribution of this project is the re-implementation of the WSNet fra
 
 In a second step, the results were reproduces as far as possible. This showed that the proposed new "state-of-the-art" architecture does not yield significant performance increasments. The global state-of-the-art methods already aim to include localized information and are state-of-the-art segmentation models because of this. Further localisation does create a hidden assumption of the context size of interest in is not neccessarily transferable to different data sets. Interesting further research could include a change of the parameters, e.g., the amount of skip connections of the used models, to improve the results.
 
+\subsection{Assessment of the proposed Global-Local Architecture}
+
+The proposed Global-Local Architecture is assessed in various settings. The general result is that it does not neccessarily improve the performance of models. It shows that reported results in papers are not generally trust-worthy. Further research on improving wound segmentation should not focus on including local information on a pre-set context size but aim to adapt state-of-the-art models for the purpose of wound segmentation by exploiting the model architectures itself.
+
 \subsection{Robustness of wound segmentation}
 
-
-
-\subsection{Explainability of segmentation results}
+The pursued experiments revealed that the performed augmentations on the training data are not sufficient to ensure that the trained models are transferable to other data sets. This was supported by experiments manually augmenting test data and testing already trained models on a different data set. To be able to deploy a segmentation model in a clinical context, more diverse and generally a higher amount of training data is required. Further research could include investigations on whether combining different data sets improves the results.

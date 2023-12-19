@@ -90,7 +90,7 @@ Since all four model architectures localize signals differently by design, the r
 	\label{table:global-local-mixed}	
 \end{table}
 
-TODO: interpret results
+Generally, the combination of two different architectures leads to similar or better performance than using the same architecture in local and global models. An exception is FPN as global model with LinkNet as local model. Two combinations stand out in their performance: U-Net as global and local model and PSPNet as global and local model. Both combinations have a lower performance with an IoU score below 0.5. Linknet and FPN as global model perform slightly better than the other two. That is consistent with the performance of the global only models reported before. Those architectures seem to extract slightly better features for wound segmentation.
 
 \subsection{Assessing the Robustness}
 
@@ -98,7 +98,7 @@ As already discussed, one problem of wound segmentation is the diversity of avai
 
 \subsubsection{Robustness against image augmentations}
 
-Augmentations are, as already discussed, commonly performed to improve the robustness of models. Analogously, augmentations can be used to access the robustness of the resulting model during testing. For the clinical application ouf wound segmentation, this includes various lightning conditions, varying image quality and various image sizes. To assess the models' robustness regarding this conditions, augmentations are performed on the test set. Because a trained model ideally should be able to deal with data acquired from different settings that was not included in training, no specific training for the tested augmentations was done.
+Augmentations are, as already discussed, commonly performed to improve the robustness of models. Analogously, augmentations can be used to access the robustness of the resulting model during testing. For the clinical application ouf wound segmentation, this includes various lighting conditions, varying image quality and various image sizes. To assess the models' robustness regarding this conditions, augmentations are performed on the test set. Because a trained model ideally should be able to deal with data acquired from different settings that was not included in training, no specific training for the tested augmentations was done.
 
 To augment the training set, tensorflow image functions were used. This makes it possible to use the already created test dataset containing tensors and transform it in a specific way. The implemented and evaluated augmentations are the following:
 
@@ -106,16 +106,10 @@ To augment the training set, tensorflow image functions were used. This makes it
 	\item[Embed] The test images were resized to be smaller than the original. The resized image was positioned in the center and remaining space was filled with black colour. This tests the model against changes in size of the wound and background changes, which is a very likely case for a real-world application. Additionally, the models can only deal with square images and rescaling and padding non-square images is a likely solution for images in other formats.
 	\item[Brightness] Changes in brightness are likely to happen as well. A brightness change with a delta of 0.1 is used in the experiment but can be adapted to test multiple scenarios.
 	\item[Saturation] This augmentation adapts the saturation of the image, which can happen due to various changes in the camera setting. The saturation is changed by a factor of 2 in this experiment.
-	\item[Contrast] A change in contrast might happen due to different camera and lightning settings. In this augmentation, the saturation is increased by a factor of 2 in this experiment. 
+	\item[Contrast] A change in contrast might happen due to different camera and lighting settings. In this augmentation, the saturation is increased by a factor of 2 in this experiment. 
 \end{description}
 
-In the scope of this project, only one augmentation is done at a time, although the experiment can be extended to include more augmentations and combinations of multiple simultaneous augmentations. The results are reported in Table \ref{table:augmentation-comparison}. Generally, changes in brightness influence the performance the least. 
-
-\begin{itemize}
-	\item local models generally worst
-	\item embed did not generally impacts global-local model the most, but for fpn, it is significantly worse than when just using a global model
-\end{itemize}
-TODO
+In the scope of this project, only one augmentation is done at a time, although the experiment can be extended to include more augmentations and combinations of multiple simultaneous augmentations. The results are reported in Table \ref{table:augmentation-comparison}. Generally, changes in brightness influence the performance the least. In terms of the performance of local, global and global-local architectures, it is clear that local models consistently perform worse and that their performance is not impacted less than the one of the other architectures. The performance of Global-Local models and Global models are both impacted similarly with the excetion of the FPN Global-Local model which is impacted more than the Global model. This findings support the findings of Global-Local models not being superior to Global-only models.
 
 \begin{table}[htb!]
 	\centering
@@ -171,10 +165,6 @@ In a second experiment, the performance is evaluated on an additional, unseen da
 	\label{table:dataset-comparison}
 \end{table}
 
-\begin{itemize}
-	\item worsens performance by huge amount for every model
-	\item probably training on mix needed but no time in the scope of the project
-	\item means results are not directly transferable to new models
-\end{itemize}
+It is clear that the models' performance drops rapidly for the unknown data set. This shows that the models are not generalising yet for other datasets and results achieved with the WSNet data set cannot be directly transferred to other data sets. It shows how crucial it is to include a diverse collection of data in training and that a focus on a specific kind of wounds changes the learned features of the model.
 
-TODO
+
