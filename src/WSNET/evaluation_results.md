@@ -172,3 +172,77 @@
 |-------|-----------|----------|-----------------|
 | 0.247 | 0.610     | 0.756    | 0.951           |
 
+# Global-Local models with mixed architectures
+
+### Global: unet, Local: linknet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.273 | 0.602     | 0.749    | 0.949           |
+
+### Global: unet, Local: pspnet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.267 | 0.607     | 0.753    | 0.947           |
+
+### Global: unet, Local: fpn
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.260 | 0.613     | 0.757    | 0.950           |
+
+### Global: linknet, Local: unet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.238 | 0.633     | 0.774    | 0.951           |
+
+### Global: linknet, Local: pspnet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.268 | 0.612     | 0.757    | 0.949           |
+
+### Global: linknet, Local: fpn
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.255 | 0.613     | 0.758    | 0.948           |
+
+### Global: pspnet, Local: unet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.307 | 0.554     | 0.711    | 0.936           |
+
+### Global: pspnet, Local: linknet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.282 | 0.576     | 0.729    | 0.940           |
+
+### Global: pspnet, Local: fpn
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.295 | 0.580     | 0.732    | 0.942           |
+
+### Global: fpn, Local: unet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.270 | 0.605     | 0.752    | 0.949           |
+
+### Global: fpn, Local: linknet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.301 | 0.585     | 0.735    | 0.944           |
+
+### Global: fpn, Local: pspnet
+
+| loss  | iou_score | f1-score | binary_accuracy |
+|-------|-----------|----------|-----------------|
+| 0.260 | 0.627     | 0.769    | 0.952           |
+
