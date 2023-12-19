@@ -1,16 +1,12 @@
 \section{Results and Evaluation}
 
+In the following, the results and contribution of this project's work are summarised and further fields of research are named.
+
 \subsection{Re-implementation and evaluation of WSNet}
 
-\begin{itemize}
-	\item contribution: reimplementation of a framework in a better documented way, making the reconstruction of results easier
-	\item documentation of this implementation
-	\item identified discrepances between paper and available code
-	\item comparison of results
-	\item showed that reported "good" architecture does not yield significant performance increasements
-	\item why: models already capture localized information, this is why those are sota segmenatation frameworks, further localisation does not really make sense, maybe rather change parameters of used models to improve results
-	\item Which architecture is suited best for wound segmentation? Why and what other alternatives would there be?
-\end{itemize}
+The first contribution of this project is the re-implementation of the WSNet framework in a more structured and parametrized manner, such that a reconstruction of results is easier and does not need to make so many assumptions about unknown factors. This includes proper documentation of the code, which was lacking in the original WSNet code. During this, discrepances between the described procedure in the paper and the available code were identified and described.
+
+In a second step, the results were reproduces as far as possible. This showed that the proposed new "state-of-the-art" architecture does not yield significant performance increasments. The global state-of-the-art methods already aim to include localized information and are state-of-the-art segmentation models because of this. Further localisation does create a hidden assumption of the context size of interest in is not neccessarily transferable to different data sets. Interesting further research could include a change of the parameters, e.g., the amount of skip connections of the used models, to improve the results.
 
 \subsection{Robustness of wound segmentation}
 
