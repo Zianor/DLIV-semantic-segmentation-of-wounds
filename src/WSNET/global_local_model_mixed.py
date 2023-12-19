@@ -5,7 +5,11 @@ from src.WSNET.helper import CreatePatches, merge_patches, putall
 
 
 def create_global_local_model_mixed(
-    segmentation_model_global, segmentation_model_local, input_size=192, activation_function="sigmoid"
+    segmentation_model_global,
+    segmentation_model_local,
+    input_size=192,
+    backbone="mobilenet",
+    activation_function="sigmoid",
 ):
     """
     :param segmentation_model_global: one of "fpn", "pspnet", "linknet", "unet"
@@ -33,7 +37,7 @@ def create_global_local_model_mixed(
         # input size must be dividable by 32
         patch_size = 64
         local_model = FPN(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(patch_size, patch_size, 3),
             classes=1,
             activation=activation_function,
@@ -42,7 +46,7 @@ def create_global_local_model_mixed(
     elif segmentation_model_local == "pspnet":
         patch_size = 48
         local_model = PSPNet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(patch_size, patch_size, 3),
             classes=1,
             activation=activation_function,
@@ -52,7 +56,7 @@ def create_global_local_model_mixed(
         # input size must be dividable by 32
         patch_size = 64
         local_model = Linknet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(patch_size, patch_size, 3),
             classes=1,
             activation=activation_function,
@@ -62,7 +66,7 @@ def create_global_local_model_mixed(
         # input size must be dividable by 32
         patch_size = 64
         local_model = Unet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(patch_size, patch_size, 3),
             classes=1,
             activation=activation_function,
@@ -76,7 +80,7 @@ def create_global_local_model_mixed(
     if segmentation_model_global == "fpn":
         # input size must be dividable by 32
         global_model = FPN(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(input_size, input_size, 3),
             classes=1,
             activation=activation_function,
@@ -84,7 +88,7 @@ def create_global_local_model_mixed(
         )
     elif segmentation_model_global == "pspnet":
         global_model = PSPNet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(input_size, input_size, 3),
             classes=1,
             activation=activation_function,
@@ -93,7 +97,7 @@ def create_global_local_model_mixed(
     elif segmentation_model_global == "linknet":
         # input size must be dividable by 32
         global_model = Linknet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(input_size, input_size, 3),
             classes=1,
             activation=activation_function,
@@ -101,7 +105,7 @@ def create_global_local_model_mixed(
         )
     elif segmentation_model_global == "unet":
         global_model = Unet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(input_size, input_size, 3),
             classes=1,
             activation=activation_function,

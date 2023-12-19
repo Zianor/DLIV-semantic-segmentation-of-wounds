@@ -5,10 +5,10 @@ import tensorflow as tf
 
 from src.helper import get_checkpoint_path
 from src.WSNET.global_local_model import create_global_local_model
+from src.WSNET.global_local_model_mixed import create_global_local_model_mixed
 from src.WSNET.global_model import create_global_model
 from src.WSNET.helper import get_datasets, split_train_test_validation
 from src.WSNET.local_model import create_local_model
-from src.WSNET.global_local_model_mixed import create_global_local_model_mixed
 
 
 def train_model(
@@ -18,6 +18,7 @@ def train_model(
     load_only=True,
     batch_size=16,
     epochs=100,
+    backbone="mobilenet",
     activation_function="sigmoid",
 ):
     """
@@ -29,6 +30,7 @@ def train_model(
     :param load_only: if True, the model is loaded from weights, else it is trained
     :param batch_size: batch size, default is 16
     :param epochs: number of epochs, default 100
+    :param backbone: name of the backbone that should be used, default is mobilenet
     :param activation_function: activation function, default is sigmoid
     """
     if type(segmentation_model) == tuple and model_architecture != "global-local":
@@ -39,28 +41,37 @@ def train_model(
         segmentation_model_str = f"{segmentation_model[0]}-{segmentation_model[1]}"
     else:
         segmentation_model_str = segmentation_model
-    if activation_function == "sigmoid":
-        checkpoint_name = f"{segmentation_model_str}-{model_architecture}"
+    if backbone == "mobilenet":
+        backbone_str = ""
     else:
-        checkpoint_name = f"{segmentation_model_str}-{model_architecture}-{activation_function}"
+        backbone_str = f"-{backbone}"
+    if activation_function == "sigmoid":
+        checkpoint_name = f"{segmentation_model_str}-{model_architecture}{backbone_str}"
+    else:
+        checkpoint_name = f"{segmentation_model_str}-{model_architecture}{backbone_str}-{activation_function}"
     two_inputs = False
     if model_architecture == "local":
-        model = create_local_model(segmentation_model, input_size, activation_function=activation_function)
+        model = create_local_model(
+            segmentation_model, input_size, backbone=backbone, activation_function=activation_function
+        )
     elif model_architecture == "global-local":
         two_inputs = True
         if type(segmentation_model) == str:
             model = create_global_local_model(
-                segmentation_model, input_size, activation_function=activation_function
+                segmentation_model, input_size, backbone=backbone, activation_function=activation_function
             )
         else:
             model = create_global_local_model_mixed(
                 segmentation_model_global=segmentation_model[0],
                 segmentation_model_local=segmentation_model[1],
                 input_size=input_size,
+                backbone=backbone,
                 activation_function=activation_function,
             )
     elif model_architecture == "global":
-        model = create_global_model(segmentation_model, input_size, activation_function=activation_function)
+        model = create_global_model(
+            segmentation_model, input_size, backbone=backbone, activation_function=activation_function
+        )
     else:
         raise ValueError('Parameter model_architecture must be one of "local", "global-local"')
 

@@ -4,11 +4,15 @@ from segmentation_models import FPN, Linknet, PSPNet, Unet
 from src.WSNET.helper import CreatePatches, putconcate, putconcate_vert
 
 
-def create_local_model(segmentation_model, input_size=192, activation_function="sigmoid"):
+def create_local_model(
+    segmentation_model, input_size=192, backbone="mobilenet", activation_function="sigmoid"
+):
     """
     :param segmentation_model: one of "fpn", "pspnet", "linknet", "unet"
     :param input_size: width and height of input images, inputs must be square image. Default is 192. Must be dividable
     by 48 and 64
+    :param backbone: name of the backbone that should be used, default is mobilenet
+    :param activation_function: activation function used, default is sigmoid
     """
     if input_size % 48 != 0:
         raise ValueError("Input size must be dividable by 48 and 64")
@@ -22,7 +26,7 @@ def create_local_model(segmentation_model, input_size=192, activation_function="
         # input size must be dividable by 32
         patch_size = 64
         local_model = FPN(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(patch_size, patch_size, 3),
             classes=1,
             activation=activation_function,
@@ -31,7 +35,7 @@ def create_local_model(segmentation_model, input_size=192, activation_function="
     elif segmentation_model == "pspnet":
         patch_size = 48
         local_model = PSPNet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(patch_size, patch_size, 3),
             classes=1,
             activation=activation_function,
@@ -41,7 +45,7 @@ def create_local_model(segmentation_model, input_size=192, activation_function="
         # input size must be dividable by 32
         patch_size = 64
         local_model = Linknet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(patch_size, patch_size, 3),
             classes=1,
             activation=activation_function,
@@ -51,7 +55,7 @@ def create_local_model(segmentation_model, input_size=192, activation_function="
         # input size must be dividable by 32
         patch_size = 64
         local_model = Unet(
-            backbone_name="mobilenet",
+            backbone_name=backbone,
             input_shape=(patch_size, patch_size, 3),
             classes=1,
             activation=activation_function,
