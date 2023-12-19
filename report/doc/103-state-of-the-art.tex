@@ -15,7 +15,7 @@ U-Net is a convolutional network developed for biomedical image segmentation bas
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{fig/unet-architecture.png}
-	\caption{U-Net architecture for 32x32 pixels in the lowes resolution. Blue boxes are feature maps with the number of feature-channels on top of the boxes and the size shown on the left size. Operations are indicated by the arrows. The skip connections are a concatenation. The figure originally create by \citeauthor{unet} \cite{unet}.}
+	\caption{U-Net architecture for 32x32 pixels in the lowest resolution. Blue boxes are feature maps with the number of feature-channels on top of the boxes and the size shown on the left size. Operations are indicated by the arrows. The skip connections are a concatenation. The figure originally create by \citeauthor{unet} \cite{unet}.}
 	\label{fig:unet-architecture}
 \end{figure}
 
@@ -64,7 +64,7 @@ The central part of the Pyramid Scene Parsing Network (PSPNet) is the pyramid po
 \begin{figure}[htb!]
 	\centering
 	\includegraphics[width=\textwidth]{fig/pspnet-architecture.png}
-	\caption{Visualization of the PSPNet-architecture. Originally created by \citeauthor{Zhao2017} \cite{Zhao2017}.}
+	\caption{Visualisation of the PSPNet-architecture. Originally created by \citeauthor{Zhao2017} \cite{Zhao2017}.}
 	\label{fig:pspnet-architecture}
 \end{figure}
 
@@ -93,7 +93,7 @@ The Dice coefficient is the F1 score calculated for the image masks. Regarding i
 
 To gain more insight into the type of errors the model makes, the rate of false positives and false negatives can be reported and then used to differentiate Type I and Type II errors \cite{DFUC2022}.
 
-% "The difference between the two metrics is that the IoU penalizes under- and over-segmentation more than DSC"
+% "The difference between the two metrics is that the IoU penalises under- and over-segmentation more than DSC"
 
 \paragraph{Loss function}
 
@@ -121,7 +121,7 @@ Not every augmentation is appropriate for every application. Rotating images of 
 
 As already discussed in the motivation of this project, wound segmentation is a complex problem due to wound characteristics such as different tissues and, therefore, edges inside of a wound itself on one side and technical reasons such as, e.g. varying lighting, distance to the wound and different angles. 
 
-Before Deep Learning became easily accessible and popular, methods based on features describing colour and textures, region-growing with optimal thresholding algorithms, and classical machine learning models were used to perform segmentation \cite{Scebba2022}. Convolutional Neural Networks replaced manually extracted features with autonomously learned ones \cite{Scebba2022}. Some methods included pre-processing steps to remove the background by, e.g., user interaction indicating the background, using a standardized background when taking the image, or using manual feature engineering to detect the background more efficiently and make the wound segmentation task easier. Such non-automatic steps limit the use of the segmentation algorithms because they either require more resources in the image-taking process or the segmentation process or are specifically tailored for specific lighting conditions or camera settings.
+Before Deep Learning became easily accessible and popular, methods based on features describing colour and textures, region-growing with optimal thresholding algorithms, and classical machine learning models were used to perform segmentation \cite{Scebba2022}. Convolutional Neural Networks replaced manually extracted features with autonomously learned ones \cite{Scebba2022}. Some methods included pre-processing steps to remove the background by, e.g., user interaction indicating the background, using a standardised background when taking the image, or using manual feature engineering to detect the background more efficiently and make the wound segmentation task easier. Such non-automatic steps limit the use of the segmentation algorithms because they either require more resources in the image-taking process or the segmentation process or are specifically tailored for specific lighting conditions or camera settings.
 
 The Diabetic Foot Ulcer Challenge 2022 used FCN, U-Net and SegNet with different backbones and categorical cross-entropy loss as the baseline for their challenge, indicating those methods reflect the current state of the art that needs to be improved \cite{DFUC2022}. Generally, such classic models are commonly used and extended with minor adaptions. Two methods stood out in the performed literature review, including more sophisticated adaptions.
 
