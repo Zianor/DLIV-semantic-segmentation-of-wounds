@@ -1,4 +1,4 @@
-\documentclass[parskip=half, headings=normal]{scrarticle}
+\documentclass[parskip=half, headings=normal, fontsize=10pt]{scrarticle}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[english]{babel}
 \usepackage{url}
@@ -6,7 +6,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{multirow}
-\usepackage[left=2cm, right=2cm, top=2cm, bottom=2.5cm]{geometry}
+\usepackage[left=2cm, right=2cm, top=2cm, bottom=1cm, includefoot, footskip=0.5cm]{geometry}
 \usepackage{setspace}
 \usepackage[hidelinks]{hyperref}
 \usepackage{csquotes}
@@ -23,9 +23,25 @@ doi=true
 
 \addbibresource{references.bib}
 
+\RedeclareSectionCommands[
+  beforeskip=.125\baselineskip,
+  afterskip=.125\baselineskip,
+]{section}
+\RedeclareSectionCommands[
+  beforeskip=.1125\baselineskip,
+  afterskip=.1125\baselineskip,
+]{subsection}
+\RedeclareSectionCommands[
+  beforeskip=.1\baselineskip,
+  afterskip=.1\baselineskip,
+]{subsubsection}
+\RedeclareSectionCommands[
+	beforeskip=.05\baselineskip,
+]{paragraph}
+
+
 
 \setlist[itemize]{noitemsep}
-\onehalfspacing
 
 \begin{document}
 

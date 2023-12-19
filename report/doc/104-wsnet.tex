@@ -1,7 +1,6 @@
 \section{WSNet}
 
-TODO: write introduction
-wanted to check results, first implement them, check for deviations, make experiments, look at explainability (maybe)
+The following section describes the assessment and evaluation of WSNet. This starts with an implementation of the tested models and with checking for deviations between described methods and available code. Following that, several experiments are performed to assess the algorithm in more detail and to check its robustness.
 
 \subsection{Code availability and reproduction of the results}
 
@@ -11,13 +10,7 @@ In this project's scope, the code was used to create runnable models again. Unfo
 
 Information about the training, validation and test set size is not given in the paper or code. However, the code reveals that the train and validation sets were just the first x\,\% of the dataset, and no randomisation was used to separate the test set as it is usually done. In this project's scope, a split of 70\,\% training, 15\,\% validation and 15\,\% test data is used.
 
-Because the data training for the wound-specific pre-training is not available, the results can only be compared for imagenet pre-training.
-
-
-\begin{itemize}
-	\item problem with imagenet pre-training with mobilenet: input size for patches is not available, instead the default size of 224 is used, which might impact results negatively
-\end{itemize}
-
+Because the data training for the wound-specific pre-training is not available, the results can only be compared for imagenet pre-training. An important aspect is, that mobilenet has no pretrained weights for images with the size of the patches and the default size of 224x224\,px is used instead, which might impact results negatively.
 
 \subsection{Comparison of the achieved performance}
 
@@ -60,9 +53,143 @@ Because the data training for the wound-specific pre-training is not available, 
 	\item no clear trend of one being clearly better for all models and architectures
 \end{itemize}
 
+\begin{table}[htb!]
+	\centering
+	\begin{tabular}{l | c ||c | c || c | c || c | c || c | c||}
+	& & \multicolumn{2}{|c||}{Unet} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
+	\hline
+	& Activation & IoU & Dice & IoU & Dice & IoU & Dice & IoU & Dice \\
+	\hline\hline
+	\multirow{2}{*}{\textbf{Local model}} & Sigmoid & 0.359 & 0.523 & 0.398 & 0.564 & 0.373 & 0.538 & 0.408 & 0.574 \\
+	& ReLU & 0.398 & 0.565 & 0.396 & 0.561 & 0.372 & 0.536 & 0.380 & 0.546 \\
+	\hline
+	\multirow{2}{*}{\textbf{Global model}} & Sigmoid & 0.504 & 0.668 & 0.631 & 0.772 & 0.458 & 0.627 & 0.632 & 0.772 \\
+	& ReLU & 0.513 & 0.676 & 0.509 & 0.672 & 0.463 & 0.631 & 0.505 & 0.669 \\
+	\hline
+	\multirow{2}{*}{\textbf{Global-Local model}} & Sigmoid & 0.495 & 0.658 & 0.618 & 0.763 & 0.476 & 0.642 & 0.612 & 0.758\\
+	& ReLU & 0.498 & 0.662 & 0.588 & 0.738 & 0.569 & 0.724 & 0.610 & 0.756 \\
+	\end{tabular}
+	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture compared for the Sigmoid and ReLU activation function.}
+	\label{table:sigmoid-relu-comparison}
+\end{table}
+
+
 \subsection{Combination of different architectures}
 
 \begin{itemize}
 	\item used model architectures localize signals differently by design
 	\item if the patch size really does play a significant role, maybe it makes sense to combine different architecture sizes?
+\end{itemize}
+
+\begin{table}[htb!]
+	\centering
+	\begin{tabular}{c|c| c| c}
+		Global Model & Local Model & IoU & Dice \\ \hline\hline
+		\multirow{4}{*}{U-Net} & U-Net & 0.495 & 0.658\\
+		 & LinkNet  & 0.602 & 0.749 \\
+		 & PSPNet & 0.607 & 0.753 \\
+		 & FPN & 0.613 & 0.757 \\\hline
+		 \multirow{4}{*}{LinkNet} & LinkNet & 0.618 & 0.763 \\
+		 & U-Net  & 0.633 & 0.774 \\
+		 & PSPNet & 0.612 & 0.757 \\
+		 & FPN & 0.613 & 0.758 \\\hline
+		 \multirow{4}{*}{PSPNet} & PSPNet & 0.476 &  0.642\\
+		 & U-Net  & 0.554 & 0.711 \\
+		 & LinkNet & 0.576 & 0.729 \\
+		 & FPN & 0.580 & 0.732 \\\hline
+		 \multirow{4}{*}{FPN} & FPN & 0.612 & 0.758 \\
+		 & U-Net  & 0.605 & 0.752 \\
+		 & LinkNet & 0.585 & 0.735 \\
+		 & PSPNet & 0.627 & 0.769 \\\hline
+	\end{tabular}	
+\end{table}
+
+
+\subsection{Assessing the Robustness}
+
+As already discussed, one problem of wound segmentation is the diversity of available wound images. A segmentation should therefore be robust and work for a variety of image types. To asses the robustness of the models, two experiments were performed: Testing the performance on augmented images and testing the performances on another data set without re-training the models.
+
+\subsubsection{Robustness against image augmentations}
+
+\begin{itemize}
+	\item augmentations commonly performed to improve robustness of models
+	\item can also be used to access robustness of the resulting model
+	\item for clinical application, lightning and size might vary between images
+	\item batch normalization might further increase this problem (TODO: search references)
+	\item what have I done: a trained model should ideally be able to deal with other kinds of data it is not trained on
+	\item for this purpose different type of augmentations performed on test set
+	\item tensorflow image functions were used for this purpose
+	\item implemented augemtations and why
+	\item embed in black box: test against changes in size, most likely the case in real scenarios. Also, the model needs a square input and images might not always be square and rescaling and padding in black background is likely solution for images in other formats
+	\item change brightness, saturation, contrast: lightning conditions might change, different camera, etc. all of those things can influence colour and lightning
+\end{itemize}
+
+\begin{table}[htb!]
+	\centering
+	\begin{tabular}{l | c ||c | c || c | c || c | c || c | c||}
+	& & \multicolumn{2}{|c||}{Unet} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
+	\hline
+	& Augmentation & IoU & Dice & IoU & Dice & IoU & Dice & IoU & Dice \\
+	\hline\hline
+	\multirow{5}{*}{\textbf{Local model}} & - & 0.359 & 0.523 & 0.398 & 0.564 & 0.373 & 0.538 & 0.408 & 0.574 \\
+	& Embed & 0.365 & 0.528 & 0.378 & 0.545 & 0.373 & 0.534 & 0.383 & 0.550\\
+	& Brightness & 0.341 & 0.503 & 0.391 & 0.557 & 0.348 & 0.510 & 0.417 & 0.583\\
+	& Contrast & 0.297 & 0.454 & 0.286 & 0.442 & 0.270 & 0.422 & 0.206 & 0.338\\
+	& Saturation & 0.310 & 0.470 & 0.284 & 0.396 & 0.245 & 0.390 & 0.211 & 0.346\\
+	\hline
+	\multirow{5}{*}{\textbf{Global model}} & - & 0.504 & 0.668 & 0.631 & 0.772 & 0.458 & 0.627 & 0.632 & 0.772 \\
+	& Embed & 0.400 & 0.566 & 0.438 & 0.607 & 0.333 & 0.497 & 0.454 & 0.622\\
+	& Brightness & 0.500 & 0.663 & 0.629 & 0.770 & 0.452 & 0.620 & 0.625 & 0.767\\
+	& Contrast & 0.404 & 0.573 & 0.539 & 0.699 & 0.334 & 0.499 & 0.562 & 0.718\\
+	& Saturation & 0.420 & 0.586 & 0.475 & 0.641 & 0.346 & 0.511 & 0.441 & 0.609\\
+	\hline
+	\multirow{5}{*}{\textbf{Global-Local model}} & - & 0.495 & 0.658 & 0.618 & 0.763 & 0.476 & 0.642 & 0.612 & 0.758\\
+	& Embed & 0.372 & 0.541 & 0.451 & 0.619 & 0.393 & 0.559 & 0.375 & 0.542\\
+	& Brightness & 0.495 & 0.659 & 0.613 & 0.759 & 0.465 & 0.632 & 0.604 & 0.751\\
+	& Contrast & 0.408 & 0.577& 0.545 & 0.704 & 0.414 & 0.583 & 0.503 & 0.666\\
+	& Saturation & 0.402 & 0.570 & 0.491 & 0.657 & 0.387 & 0.555 & 0.490 & 0.654\\
+	\end{tabular}
+	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture compared for different augmentations on the test images.}
+	\label{table:dataset-comparison}
+\end{table}
+
+\begin{itemize}
+	\item brightness change influences performance the least
+	\item local models generally worst
+	\item embed did not generally impacts global-local model the most, but for fpn, it is significantly worse than when just using a global model
+\end{itemize}
+
+\subsubsection{Performance on an unseen data set}
+
+\begin{itemize}
+	\item data set of Foot Ulcer Segmentation Challenge 2021 \cite{Wang2020} used that was mentioned in section \ref{sec:data-sets}
+	\item data is loaded, resized to 192x192\,px and then tested with the already trained models
+	\item results are displayed together with the original data set from WSNet in table \ref{table:dataset-comparison}.
+\end{itemize}
+
+
+\begin{table}[htb!]
+	\centering
+	\begin{tabular}{l | c ||c | c || c | c || c | c || c | c||}
+	& & \multicolumn{2}{|c||}{Unet} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
+	\hline
+	& Data set & IoU & Dice & IoU & Dice & IoU & Dice & IoU & Dice \\
+	\hline\hline
+	\multirow{2}{*}{\textbf{Local model}} & WSNet & 0.359 & 0.523 & 0.398 & 0.564 & 0.373 & 0.538 & 0.408 & 0.574 \\
+	& DFUC & 0.262 & 0.411 & 0.203 & 0.335 & 0.231 & 0.372 & 0.231 & 0.372\\
+	\hline
+	\multirow{2}{*}{\textbf{Global model}} & WSNet & 0.504 & 0.668 & 0.631 & 0.772 & 0.458 & 0.627 & 0.632 & 0.772 \\
+	& DFUC & 0.214 & 0.350 & 0.276 & 0.428 & 0.155 & 0.265 & 0.238 & 0.380\\
+	\hline
+	\multirow{2}{*}{\textbf{Global-Local model}} & WSNet & 0.495 & 0.658 & 0.618 & 0.763 & 0.476 & 0.642 & 0.612 & 0.758\\
+	& DFUC & 0.201 & 0.330 & 0.181 & 0.304 & 0.181 & 0.304 & 0.215 & 0.349\\
+	\end{tabular}
+	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture compared for the WSNet and the Diabetes Foot Ulcer Challenge (DFUC) 2021 data.}
+	\label{table:dataset-comparison}
+\end{table}
+
+\begin{itemize}
+	\item worsens performance by huge amount for every model
+	\item probably training on mix needed but no time in the scope of the project
+	\item means results are not directly transferable to new models
 \end{itemize}
