@@ -5,6 +5,7 @@ from math import ceil
 from src.helper import (
     create_markdown_table_str_for_metrics,
     get_architecture_title,
+    get_dfuc_dataset,
     get_segmentation_model_title,
 )
 
@@ -28,13 +29,15 @@ if __name__ == "__main__":
             for activation_function in activation_functions:
                 markdown_lines.append(f"##### {activation_function.title()}")
                 markdown_lines.append("")
-                model, train_gen, val_gen, test_gen = train_model(
+                model, _, _, _ = train_model(
                     segmentation_model=segmentation_model,
                     model_architecture=model_architecture,
                     load_only=True,
                     activation_function=activation_function,
                 )
-                results = model.evaluate(test_gen, steps=ceil(float(test_images_count) / float(batch_size)))
+                two_inputs = True if model_architecture == "global-local" else False
+                dfuc_gen = get_dfuc_dataset(two_inputs=two_inputs)
+                results = model.evaluate(dfuc_gen, steps=ceil(float(test_images_count) / float(batch_size)))
                 results_dict = dict(zip(model.metrics_names, results))
                 markdown_lines.append(create_markdown_table_str_for_metrics(results_dict))
                 print(f"Model {segmentation_model} {model_architecture} {activation_function}")
@@ -49,17 +52,18 @@ if __name__ == "__main__":
         markdown_lines.append(
             f"### Global: {segmentation_model_tuple[0]}, Local: {segmentation_model_tuple[1]}\n"
         )
-        model, train_gen, val_gen, test_gen = train_model(
+        model, _, _, _ = train_model(
             segmentation_model=segmentation_model_tuple,
             model_architecture="global-local",
             load_only=True,
             activation_function=activation_function,
         )
-        results = model.evaluate(test_gen, steps=ceil(float(test_images_count) / float(batch_size)))
+        dfuc_gen = get_dfuc_dataset(two_inputs=True)
+        results = model.evaluate(dfuc_gen, steps=ceil(float(test_images_count) / float(batch_size)))
         results_dict = dict(zip(model.metrics_names, results))
         markdown_lines.append(create_markdown_table_str_for_metrics(results_dict))
 
-    with open("evaluation_results.md", "w") as writer:
+    with open("evaluation_results_dfuc.md", "w") as writer:
         for line in markdown_lines:
             writer.write(line)
             writer.write("\n")

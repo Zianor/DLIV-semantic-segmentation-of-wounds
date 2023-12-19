@@ -6,5 +6,7 @@ src/WSNET/__pycache__/
 src/DLIV_chronic_wound_segmentation.egg-info
 src/data/wound_images/*.jpg
 src/data/wound_masks/*.jpg
+src/data/DiabetesFootUlcerChallenge2021/wound_images/*.png
+src/data/DiabetesFootUlcerChallenge2021/wound_masks/*.png
 /report/doc/.texpadtmp/
 src/trained_models/*.h5
