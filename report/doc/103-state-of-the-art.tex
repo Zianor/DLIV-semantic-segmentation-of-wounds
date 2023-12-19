@@ -149,6 +149,13 @@ Although the combination of global and local signals sounds reasonable initially
 
 \citeauthor{Oota_2023_WACV} report that wound-specific pre-training improves the resulting segmentation. Furthermore, they find that data augmentation leads to improvements. As expected, the local-only models perform significantly worse than using the segmentation model as intended in a global way. Furthermore, they find that combining global and local models leads to an improved performance compared to the global models. This indicates that the chosen patch size yields valuable information for the segmentation. The best results are therefore achieved with wound-specific pre-training, data augmentation and the invented Global-Local architecture.
 
+\begin{table}[htb!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{fig/wsnet-results.png}
+	\caption{Results reported by \citeauthor{Oota_2023_WACV} \cite{Oota_2023_WACV}.}
+	\label{table:results-wsnet}
+\end{table}
+
 Reporting such results always leads to the question of whether they are reproducible. This is especially the case with the Global-Local architecture with a specific patch size, leading to questioning whether the patch size can be generalised to other image sizes and other data sets.
 
 

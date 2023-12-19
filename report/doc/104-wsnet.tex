@@ -6,18 +6,22 @@ The following section describes the assessment and evaluation of WSNet. This sta
 
 Although the code for WSNet \cite{Oota_2023_WACV} is stated to be publicly available, a closer inspection of the linked GitHub repository shows that this is only partially the case. A lack of documentation makes using the code hard, especially since it seems to contain multiple errors, making it only suitable as a base for new code.
 
-In this project's scope, the code was used to create runnable models again. Unfortunately, the classes of the wounds are not available, making it impossible to perform pre-training as described in the original paper \cite{Oota_2023_WACV}. In total, there are eight models available: A local model and a combined global-local model for each of the segmentation models: Unet, PSPNet, FPN, and LinkNet. The Python library used for the segmentation models is \texttt{segmentation\_models} \cite{SegmentationModels}. The implementation process showed some differences from the described model architecture. In particular, it was claimed that the wound images were split up in parts of 48\,px times 48\,px. However, three of the four models, all besides PSPNet, only allow input sizes divisible by 32, and the code in GitHub showed a size of 64\,px was used. Another difference between the available code and the paper is that it is claimed that augmentation is not performed on the test images, which is not the case.
+In this project's scope, the code was used to create runnable models again. Unfortunately, the classes of the wounds are not available, making it impossible to perform pre-training as described in the original paper \cite{Oota_2023_WACV}. In total, there are eight models available: A local model and a combined global-local model for each of the segmentation models: U-Net, PSPNet, FPN, and LinkNet. The Python library used for the segmentation models is \texttt{segmentation\_models} \cite{SegmentationModels}. The implementation process showed some differences from the described model architecture. In particular, it was claimed that the wound images were split up in parts of 48\,px times 48\,px. However, three of the four models, all besides PSPNet, only allow input sizes divisible by 32, and the code in GitHub showed a size of 64\,px was used. Another difference between the available code and the paper is that it is claimed that augmentation is not performed on the test images, which is not the case.
 
 Information about the training, validation and test set size is not given in the paper or code. However, the code reveals that the train and validation sets were just the first x\,\% of the dataset, and no randomisation was used to separate the test set as it is usually done. In this project's scope, a split of 70\,\% training, 15\,\% validation and 15\,\% test data is used.
 
-Because the data training for the wound-specific pre-training is not available, the results can only be compared for imagenet pre-training. An important aspect is, that mobilenet has no pretrained weights for images with the size of the patches and the default size of 224x224\,px is used instead, which might impact results negatively.
+Because the data training for the wound-specific pre-training is not available, the results can only be compared for imagenet pre-training. An important aspect is, that MobileNet has no pretrained weights for images with the size of the patches and the default size of 224x224\,px is used instead, which might impact results negatively.
+
+The used loss and activation functions were a Dice-Loss function and sigmoid as activation function.
 
 \subsection{Comparison of the achieved performance}
+
+The results achieved with the 70:15:15 split of the data and MobileNet as backbone are shown in Table \ref{fig:results-own}. Generally, the results are comparable to the results reported by \citeauthor{Oota_2023_WACV} (shown in Table \ref{table:results-wsnet}), although the performance achieved in this project is slightly lower. Some deviations are bigger, for example the Global-Local model with U-Net achieved an IoU score of 0.495 while \citeauthor{Oota_2023_WACV} reported a score of 0.620 (Dice score 0.658 vs. 0.763). Other scores are closer, e.g., the Global-Local model with LinkNet that achieved IoE scores of 0.618 vs. 0.621 respectively and a Dices score of 0.763. Such deviations could be based in a different training size.
 
 \begin{table}[htb!]
 	\centering
 	\begin{tabular}{l||c | c | c | c | c | c | c | c|}
-	& \multicolumn{2}{|c|}{Unet} & \multicolumn{2}{|c|}{LinkNet} & \multicolumn{2}{|c|}{PSPNet} & \multicolumn{2}{|c|}{FPN} \\
+	& \multicolumn{2}{|c|}{U-Net} & \multicolumn{2}{|c|}{LinkNet} & \multicolumn{2}{|c|}{PSPNet} & \multicolumn{2}{|c|}{FPN} \\
 	\hline
 	& IoU & Dice & IoU & Dice & IoU & Dice & IoU & Dice \\
 	\hline\hline
@@ -26,37 +30,19 @@ Because the data training for the wound-specific pre-training is not available, 
 	\textbf{Global-Local model} & 0.495 & 0.658 & 0.618 & 0.763 & 0.476 & 0.642 & 0.612 & 0.758\\
 	\end{tabular}
 	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture. The backbone used is mobilenet.}
+	\label{fig:results-own}
 \end{table}
 
-\begin{table}[htb!]
-	\centering
-	\includegraphics[width=\textwidth]{fig/wsnet-results.png}
-	\caption{Results reported by \citeauthor{Oota_2023_WACV} \cite{Oota_2023_WACV}.}
-\end{table}
-
-\begin{itemize}
-	\item results are comparable with results reported in paper, slightly lower scores
-	\item e.g. Unet IoU score 0.495 with my code, 0.620 in paper (dice score 0.761 vs 0.658)
-	\item others are closer (LinkNet 0.618 from me vs 0.621 in paper, dice 0.763 in paper and for me)
-	\item maybe differences in training size
-	\item most important thing: the global-local model does not improve about global model (or at least less than reported in paper)
-	\item but they are still way more computationally expensive because you need to train two models instead of one
-	\item as discussed before, an improvement indicates that something is going on with 48\,px context size
-	\item the results reported by \citeauthor{Oota_2023_WACV} are shown in figure
-\end{itemize}
+A more important finding is that in the re-implemented models the Global-Local model does not neccessarily lead to an improved performance compared to the Global model. So the additional use of local information in a specific region size dose not necessarily improve the overall results. However, the results reported here are only for MobileNet as backbone where no weights specific to the patch size could be loaded. But even with a slight improved performance it is still arguable that the use of a Global-Local model is not the best choice since it includes some drawbacks: First, it is computationally significantly more complex and second implies that the chosen patch size has a special meaning.
 
 \subsection{Experiments with the activation function}
 
-\begin{itemize}
-	\item code shows use of sigmoid as activation function
-	\item literature of the model reports ReLU more frequently, thus it was tested as alternative to sigmoid
-	\item no clear trend of one being clearly better for all models and architectures
-\end{itemize}
+The original papers describing the four used model architectures mostly mention ReLU as activation function. However, \citeauthor{Oota_2023_WACV} use Sigmoid in all their experiments. Because no clear findings were find on whether one of the activation functions is more appropriate, an experiment comparing both for all model architectures was performed.
 
 \begin{table}[htb!]
 	\centering
 	\begin{tabular}{l | c ||c | c || c | c || c | c || c | c||}
-	& & \multicolumn{2}{|c||}{Unet} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
+	& & \multicolumn{2}{|c||}{U-Net} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
 	\hline
 	& Activation & IoU & Dice & IoU & Dice & IoU & Dice & IoU & Dice \\
 	\hline\hline
@@ -73,13 +59,11 @@ Because the data training for the wound-specific pre-training is not available, 
 	\label{table:sigmoid-relu-comparison}
 \end{table}
 
+The results, reported in Table \ref{table:sigmoid-relu-comparison}, show that there is no clear trend of one of the functions performaning higher on all model architectures. Therefore, the chosen activation function is excluded as factor for further experiments.
 
 \subsection{Combination of different architectures}
 
-\begin{itemize}
-	\item used model architectures localize signals differently by design
-	\item if the patch size really does play a significant role, maybe it makes sense to combine different architecture sizes?
-\end{itemize}
+Since all four model architectures localize signals differently by design, the resulting local and global feature information also differ from each other. Following \citeauthor{Oota_2023_WACV} and assuming the inclusion of local models increases the performance, it might be interesting to combine different architectures in the Global-Local models. This was assesed by training and evaluating all possible combinations of the models in the Global-Local architectures. The results are reported in Table \ref{table:global-local-mixed}.
 
 \begin{table}[htb!]
 	\centering
@@ -101,9 +85,12 @@ Because the data training for the wound-specific pre-training is not available, 
 		 & U-Net  & 0.605 & 0.752 \\
 		 & LinkNet & 0.585 & 0.735 \\
 		 & PSPNet & 0.627 & 0.769 \\\hline
-	\end{tabular}	
+	\end{tabular}
+	\caption{The performance of Global-Local models with all possible architecture combinations. MobileNet is used as backbone and sigmoid as activation function}
+	\label{table:global-local-mixed}	
 \end{table}
 
+TODO: interpret results
 
 \subsection{Assessing the Robustness}
 
@@ -111,23 +98,29 @@ As already discussed, one problem of wound segmentation is the diversity of avai
 
 \subsubsection{Robustness against image augmentations}
 
+Augmentations are, as already discussed, commonly performed to improve the robustness of models. Analogously, augmentations can be used to access the robustness of the resulting model during testing. For the clinical application ouf wound segmentation, this includes various lightning conditions, varying image quality and various image sizes. To assess the models' robustness regarding this conditions, augmentations are performed on the test set. Because a trained model ideally should be able to deal with data acquired from different settings that was not included in training, no specific training for the tested augmentations was done.
+
+To augment the training set, tensorflow image functions were used. This makes it possible to use the already created test dataset containing tensors and transform it in a specific way. The implemented and evaluated augmentations are the following:
+
+\begin{description}[leftmargin=10px]
+	\item[Embed] The test images were resized to be smaller than the original. The resized image was positioned in the center and remaining space was filled with black colour. This tests the model against changes in size of the wound and background changes, which is a very likely case for a real-world application. Additionally, the models can only deal with square images and rescaling and padding non-square images is a likely solution for images in other formats.
+	\item[Brightness] Changes in brightness are likely to happen as well. A brightness change with a delta of 0.1 is used in the experiment but can be adapted to test multiple scenarios.
+	\item[Saturation] This augmentation adapts the saturation of the image, which can happen due to various changes in the camera setting. The saturation is changed by a factor of 2 in this experiment.
+	\item[Contrast] A change in contrast might happen due to different camera and lightning settings. In this augmentation, the saturation is increased by a factor of 2 in this experiment. 
+\end{description}
+
+In the scope of this project, only one augmentation is done at a time, although the experiment can be extended to include more augmentations and combinations of multiple simultaneous augmentations. The results are reported in Table \ref{table:augmentation-comparison}. Generally, changes in brightness influence the performance the least. 
+
 \begin{itemize}
-	\item augmentations commonly performed to improve robustness of models
-	\item can also be used to access robustness of the resulting model
-	\item for clinical application, lightning and size might vary between images
-	\item batch normalization might further increase this problem (TODO: search references)
-	\item what have I done: a trained model should ideally be able to deal with other kinds of data it is not trained on
-	\item for this purpose different type of augmentations performed on test set
-	\item tensorflow image functions were used for this purpose
-	\item implemented augemtations and why
-	\item embed in black box: test against changes in size, most likely the case in real scenarios. Also, the model needs a square input and images might not always be square and rescaling and padding in black background is likely solution for images in other formats
-	\item change brightness, saturation, contrast: lightning conditions might change, different camera, etc. all of those things can influence colour and lightning
+	\item local models generally worst
+	\item embed did not generally impacts global-local model the most, but for fpn, it is significantly worse than when just using a global model
 \end{itemize}
+TODO
 
 \begin{table}[htb!]
 	\centering
 	\begin{tabular}{l | c ||c | c || c | c || c | c || c | c||}
-	& & \multicolumn{2}{|c||}{Unet} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
+	& & \multicolumn{2}{|c||}{U-Net} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
 	\hline
 	& Augmentation & IoU & Dice & IoU & Dice & IoU & Dice & IoU & Dice \\
 	\hline\hline
@@ -150,28 +143,18 @@ As already discussed, one problem of wound segmentation is the diversity of avai
 	& Saturation & 0.402 & 0.570 & 0.491 & 0.657 & 0.387 & 0.555 & 0.490 & 0.654\\
 	\end{tabular}
 	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture compared for different augmentations on the test images.}
-	\label{table:dataset-comparison}
+	\label{table:augmentation-comparison}
 \end{table}
-
-\begin{itemize}
-	\item brightness change influences performance the least
-	\item local models generally worst
-	\item embed did not generally impacts global-local model the most, but for fpn, it is significantly worse than when just using a global model
-\end{itemize}
 
 \subsubsection{Performance on an unseen data set}
 
-\begin{itemize}
-	\item data set of Foot Ulcer Segmentation Challenge 2021 \cite{Wang2020} used that was mentioned in section \ref{sec:data-sets}
-	\item data is loaded, resized to 192x192\,px and then tested with the already trained models
-	\item results are displayed together with the original data set from WSNet in table \ref{table:dataset-comparison}.
-\end{itemize}
+In a second experiment, the performance is evaluated on an additional, unseen data set. For this purpose, the data set of the Diabetes Foot Ulcer Segmentation Challenge 2021 \cite{Wang2020} is used. More details can be found in section \ref{sec:data-sets}. The non-augmented images are loaded, resized to 192x192\,px and then tested with the already trained models. The performance metrics are displayed in table \ref{table:dataset-comparison}, in comparison with the performance on test data of the original WSNet data set.
 
 
 \begin{table}[htb!]
 	\centering
 	\begin{tabular}{l | c ||c | c || c | c || c | c || c | c||}
-	& & \multicolumn{2}{|c||}{Unet} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
+	& & \multicolumn{2}{|c||}{U-Net} & \multicolumn{2}{|c||}{LinkNet} & \multicolumn{2}{|c||}{PSPNet} & \multicolumn{2}{|c||}{FPN} \\
 	\hline
 	& Data set & IoU & Dice & IoU & Dice & IoU & Dice & IoU & Dice \\
 	\hline\hline
@@ -184,7 +167,7 @@ As already discussed, one problem of wound segmentation is the diversity of avai
 	\multirow{2}{*}{\textbf{Global-Local model}} & WSNet & 0.495 & 0.658 & 0.618 & 0.763 & 0.476 & 0.642 & 0.612 & 0.758\\
 	& DFUC & 0.201 & 0.330 & 0.181 & 0.304 & 0.181 & 0.304 & 0.215 & 0.349\\
 	\end{tabular}
-	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture compared for the WSNet and the Diabetes Foot Ulcer Challenge (DFUC) 2021 data.}
+	\caption{IoU-Scores and Dice Coefficients for the four different models with each Global-Local, Global and Local architecture compared for the WSNet and the Diabetes Foot Ulcer Segmentation Challenge (DFUC) 2021 data.}
 	\label{table:dataset-comparison}
 \end{table}
 
@@ -193,3 +176,5 @@ As already discussed, one problem of wound segmentation is the diversity of avai
 	\item probably training on mix needed but no time in the scope of the project
 	\item means results are not directly transferable to new models
 \end{itemize}
+
+TODO
