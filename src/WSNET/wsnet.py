@@ -4,6 +4,7 @@ import segmentation_models as sm
 import tensorflow as tf
 
 from src.helper import get_checkpoint_path
+from src.WSNET.global_global_model import create_global_global_model
 from src.WSNET.global_local_model import create_global_local_model
 from src.WSNET.global_local_model_mixed import create_global_local_model_mixed
 from src.WSNET.global_model import create_global_model
@@ -23,8 +24,8 @@ def train_model(
 ):
     """
     :param segmentation_model: one of "fpn", "pspnet", "linknet", "unet", can be a tuple of (global_model, local_model)
-     for "global-local" architecture
-    :param model_architecture: one of "local", "global-local"
+     for "global-local" architecture or (global_model, global_model) for "global-global" architecture
+    :param model_architecture: one of "local", "global-local", "global" or "global-global"
     :param input_size: width and height of input images, inputs must be square image. Default is 192. Must be dividable
     by 48 and 64
     :param load_only: if True, the model is loaded from weights, else it is trained
@@ -33,7 +34,7 @@ def train_model(
     :param backbone: name of the backbone that should be used, default is mobilenet
     :param activation_function: activation function, default is sigmoid
     """
-    if type(segmentation_model) == tuple and model_architecture != "global-local":
+    if type(segmentation_model) == tuple and model_architecture not in ["global-local", "global-global"]:
         raise ValueError(
             "Parameter segementation_model must be of type string if the model architecture is local or global"
         )
@@ -72,8 +73,21 @@ def train_model(
         model = create_global_model(
             segmentation_model, input_size, backbone=backbone, activation_function=activation_function
         )
+    elif model_architecture == "global-global":
+        two_inputs = True
+        if not isinstance(segmentation_model, tuple):
+            raise ValueError("Parameter segmentation_model must be a tuple for global-global architecture")
+        model = create_global_global_model(
+            segmentation_model_1=segmentation_model[0],
+            segmentation_model_2=segmentation_model[1],
+            input_size=input_size,
+            backbone=backbone,
+            activation_function=activation_function,
+        )
     else:
-        raise ValueError('Parameter model_architecture must be one of "local", "global-local"')
+        raise ValueError(
+            'Parameter model_architecture must be one of "local", "global-local", "global", "global-global"'
+        )
 
     checkpoint_path = get_checkpoint_path(checkpoint_name, False)
 

@@ -17,6 +17,7 @@ def create_global_local_model_mixed(
     segmentation_model_global
     :param input_size: width and height of input images, inputs must be square image. Default is 192. Must be dividable
     by 48 and 64
+    :param backbone: name of the backbone that should be used, default is mobilenet
     :param activation_function: activation function used, default is sigmoid
     """
     if input_size % 48 != 0:
