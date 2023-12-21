@@ -14,7 +14,7 @@ os.environ["SM_FRAMEWORK"] = "tf.keras"
 from src.WSNET.wsnet import train_model
 
 if __name__ == "__main__":
-    test_images_count = 403
+    test_images_count = 1010
     batch_size = 16
     segmentation_models = ["unet", "linknet", "pspnet", "fpn"]
     model_architectures = ["local", "global", "global-local"]
