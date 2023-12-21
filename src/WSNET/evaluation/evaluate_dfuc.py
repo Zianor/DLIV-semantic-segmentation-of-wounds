@@ -63,7 +63,7 @@ if __name__ == "__main__":
         results_dict = dict(zip(model.metrics_names, results))
         markdown_lines.append(create_markdown_table_str_for_metrics(results_dict))
 
-    with open("evaluation_results_dfuc.md", "w") as writer:
+    with open(os.path.join("results", "evaluation_results_dfuc.md"), "w") as writer:
         for line in markdown_lines:
             writer.write(line)
             writer.write("\n")

@@ -2,6 +2,7 @@
 */.texpadtmp
 src/__pycache__/
 src/WSNET/__pycache__/
+src/WSNET/evaluation/__pycache__/
 *.ipynb_checkpoints/
 src/DLIV_chronic_wound_segmentation.egg-info
 src/data/wound_images/*.jpg

@@ -74,7 +74,7 @@ def get_results_with_augmentations():
 
 
 def write_results_as_json(results):
-    with open("evaluation_augmentations.json", "w") as write_file:
+    with open(os.path.join("results", "evaluation_augmentations.json"), "w") as write_file:
         json.dump(results, write_file)
 
 

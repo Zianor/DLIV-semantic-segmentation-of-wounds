@@ -4,12 +4,12 @@ import segmentation_models as sm
 import tensorflow as tf
 
 from src.helper import get_checkpoint_path
-from src.WSNET.global_global_model import create_global_global_model
-from src.WSNET.global_local_model import create_global_local_model
-from src.WSNET.global_local_model_mixed import create_global_local_model_mixed
-from src.WSNET.global_model import create_global_model
 from src.WSNET.helper import get_datasets, split_train_test_validation
-from src.WSNET.local_model import create_local_model
+from src.WSNET.models.global_global_model import create_global_global_model
+from src.WSNET.models.global_local_model import create_global_local_model
+from src.WSNET.models.global_local_model_mixed import create_global_local_model_mixed
+from src.WSNET.models.global_model import create_global_model
+from src.WSNET.models.local_model import create_local_model
 
 
 def train_model(
