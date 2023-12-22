@@ -9,7 +9,9 @@ def create_global_global_model(
     backbone="mobilenet",
     activation_function="sigmoid",
 ):
-    """
+    """This architecture consists of two segmentation models. The resulting segmentations are combined by a 1x1
+    convolution to obtain the final segmentation
+
     :param segmentation_model_1: one of "fpn", "pspnet", "linknet", "unet"
     :param segmentation_model_2: one of "fpn", "pspnet", "linknet", "unet", should be different from
     segmentation_model_1

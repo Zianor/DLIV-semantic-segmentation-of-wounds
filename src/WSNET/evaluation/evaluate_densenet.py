@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 
@@ -9,8 +10,6 @@ from src.helper import (
 from WSNET.evaluation.helper import evaluate_model
 
 if __name__ == "__main__":
-    test_images_count = 403
-    batch_size = 16
     segmentation_models = ["unet", "linknet", "pspnet", "fpn"]
     model_architectures = ["local", "global", "global-local"]
     activation_functions = ["sigmoid"]
@@ -39,15 +38,12 @@ if __name__ == "__main__":
                 print(", ".join(f"{key}: {value:.3f}" for key, value in results_dict.items()))
             architecture_dict[segmentation_model] = model_dict
         print("-----")
-        with open(
-            os.path.join(Path.cwd().parent, "results", "evaluation_results_densenet.md"), "w"
-        ) as writer:
-            for line in markdown_lines:
-                writer.write(line)
-                writer.write("\n")
-        with open(
-            os.path.join(Path.cwd().parent, "results", "evaluation_results_densenet.md"), "w"
-        ) as writer:
-            for line in markdown_lines:
-                writer.write(line)
-                writer.write("\n")
+        all_results[model_architecture] = architecture_dict
+    with open(os.path.join(Path.cwd().parent, "results", "evaluation_results_densenet.md"), "w") as writer:
+        for line in markdown_lines:
+            writer.write(line)
+            writer.write("\n")
+    with open(
+        os.path.join(Path.cwd().parent, "results", "evaluation_results_densenet.json"), "w"
+    ) as write_file:
+        json.dump(all_results, write_file)

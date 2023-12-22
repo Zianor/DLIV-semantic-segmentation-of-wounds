@@ -7,10 +7,16 @@ from src.WSNET.helper import CreatePatches, merge_patches, putall
 def create_global_local_model(
     segmentation_model, input_size=192, backbone="mobilenet", activation_function="sigmoid"
 ):
-    """
+    """This architecture consists of two segmentation models, a global one and a local one, as suggested in WSNet. The
+    local model consists of several patches that are used to train a model with shared weights simultaneously and
+    eventually concatenated again
+    The resulting segmentations are combined by a 1x1 convolution to obtain the final segmentation
+
+
     :param segmentation_model: one of "fpn", "pspnet", "linknet", "unet"
     :param input_size: width and height of input images, inputs must be square image. Default is 192. Must be dividable
     by 48 and 64
+    :param backbone: name of the backbone that should be used, default is mobilenet
     :param activation_function: activation function used, default is sigmoid
     """
     if input_size % 48 != 0:

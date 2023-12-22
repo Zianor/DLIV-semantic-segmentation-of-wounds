@@ -16,6 +16,9 @@ def evaluate_model(
     :param backbone: name of the backbone that should be used, default is mobilenet
     :param activation_function: activation function, default is sigmoid
     """
+    from WSNET.helper import get_image_counts
+
+    _, _, test_images_count = get_image_counts()
     test_images_count = 403
     batch_size = 16
     model, train_gen, val_gen, test_gen = train_model(

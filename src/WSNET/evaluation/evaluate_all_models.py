@@ -10,8 +10,6 @@ from src.helper import (
 from src.WSNET.evaluation.helper import evaluate_model
 
 if __name__ == "__main__":
-    test_images_count = 403
-    batch_size = 16
     segmentation_models = ["unet", "linknet", "pspnet", "fpn"]
     model_architectures = ["local", "global", "global-local"]
     activation_functions = ["sigmoid", "relu"]
