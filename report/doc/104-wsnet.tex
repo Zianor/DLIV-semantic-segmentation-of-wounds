@@ -92,6 +92,8 @@ Since all four model architectures localise signals differently by design, the r
 
 Generally, combining two different architectures leads to similar or better performance than using the same architecture in local and global models. An exception is FPN as the global model with LinkNet as the local model. Two combinations stand out in their performance: U-Net as the global and local model and PSPNet as the global and local model. Both combinations have a lower performance, with an IoU score below 0.5. Linknet and FPN as global models perform slightly better than the other two. That is consistent with the performance of the global-only models reported before. Those architectures seem to extract slightly better features for wound segmentation.
 
+However, the combined models do not perform significantly better than the global-only models. This does not change, when two global architectures are combined.
+
 \subsection{Assessing the Robustness}
 
 As already discussed, one problem of wound segmentation is the diversity of available wound images. Therefore, segmentation should be robust and work for various image types. To assess the robustness of the models, two experiments were performed: Testing the performance on augmented images and testing the performances on another data set without re-training the models.
