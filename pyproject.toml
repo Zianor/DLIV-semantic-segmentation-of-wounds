@@ -1,5 +1,5 @@
 [project]
-name = "DLIV-chronic-wound-segmentation"
+name = "DLIV-semantic-segmentation-of-wounds"
 version="0.0.1"
 description="My project for the course Deep Learning for Image & Video Processing at Maastricht University"
 dependencies = [
@@ -25,6 +25,9 @@ dev = [
     "black",
     "pre-commit"
 ]
+
+[project.urls]
+Repository = "https://github.com/Zianor/DLIV-semantic-segmentation-of-wounds"
 
 [tool.black]
 line-length = 110

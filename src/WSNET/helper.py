@@ -16,12 +16,15 @@ from src.helper import get_data_dirs
 
 
 def assign_patches(x):
+    """This method is copied from https://github.com/subbareddy248/WSNET/"""
     image, patch = x
     image = patch
     return image
 
 
 class CreatePatches(tf.keras.layers.Layer):
+    """This method is copied from https://github.com/subbareddy248/WSNET/"""
+
     def __init__(self, patch_size):
         super(CreatePatches, self).__init__()
         self.patch_size = patch_size
@@ -37,6 +40,7 @@ class CreatePatches(tf.keras.layers.Layer):
 
 
 def putconcate(x, layer_count=4):
+    """This method is copied from https://github.com/subbareddy248/WSNET/ and adapted to work for different layer counts"""
     if layer_count == 4:
         x1, x2, x3, x4 = x
         return K.concatenate([x1, x2, x3, x4], axis=2)
@@ -46,6 +50,7 @@ def putconcate(x, layer_count=4):
 
 
 def putconcate_vert(x, layer_count=4):
+    """This method is copied from https://github.com/subbareddy248/WSNET/ and adapted to work for different layer counts"""
     if layer_count == 4:
         x1, x2, x3, x4 = x
         return K.concatenate([x1, x2, x3, x4], axis=1)
@@ -55,6 +60,7 @@ def putconcate_vert(x, layer_count=4):
 
 
 def putall(x, layer_count=9):
+    """This method is copied from https://github.com/subbareddy248/WSNET/"""
     if layer_count == 9:
         x1, x2, x3, x4, x5, x6, x7, x8, x9 = x
         return K.stack([x1, x2, x3, x4, x5, x6, x7, x8, x9], axis=1)
@@ -64,16 +70,19 @@ def putall(x, layer_count=9):
 
 
 def merge_patches(x):
+    """This method is copied from https://github.com/subbareddy248/WSNET/"""
     return K.reshape(x, (-1, 192, 192, 1))
 
 
 def normalize(arr):
+    """This method is copied from https://github.com/subbareddy248/WSNET/"""
     diff = np.amax(arr) - np.amin(arr)
     diff = 255 if diff == 0 else diff
     arr = arr / np.absolute(diff)
     return arr
 
 
+# This augmentation is copied from https://github.com/subbareddy248/WSNET/
 transform = A.Compose(
     [
         A.HorizontalFlip(p=0.5),
@@ -92,7 +101,8 @@ transform = A.Compose(
 
 
 def generate_data(images_list, batch_size, dims, train=False, val=False, test=False, two_inputs=False):
-    """Replaces Keras' native ImageDataGenerator."""
+    """Replaces Keras' native ImageDataGenerator. Based on code from https://github.com/subbareddy248/WSNET/ and
+    adapted"""
     data_dir, mask_dir = get_data_dirs(colab=False)
     if not (train or val or test):
         raise ValueError("one of train or val or test need to be True")
@@ -147,8 +157,8 @@ def generate_data(images_list, batch_size, dims, train=False, val=False, test=Fa
 
 
 def split_train_test_validation():
-    """
-    :return: [train_images, validation_images, test_images]
+    """Split the WSNet data in train test and validation split with a ratio of 70:15:15
+    :return: [train_images, validation_images, test_images], containing the file names
     """
     data_dir, mask_dir = get_data_dirs(False)
     all_images = os.listdir(data_dir)
@@ -159,6 +169,12 @@ def split_train_test_validation():
         test_images, train_size=0.5, test_size=0.5, random_state=0
     )
     return train_images, validation_images, test_images
+
+
+def get_image_counts():
+    """Returns the number of images in the train, validation and test set of the WSNet data set"""
+    train_images, validation_images, test_images = split_train_test_validation()
+    return len(train_images), len(validation_images), len(test_images)
 
 
 def get_datasets(train_images, validation_images, test_images, two_inputs, batch_size=16, input_size=192):

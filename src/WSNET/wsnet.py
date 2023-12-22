@@ -57,7 +57,7 @@ def train_model(
         )
     elif model_architecture == "global-local":
         two_inputs = True
-        if type(segmentation_model) == str:
+        if isinstance(segmentation_model, str):
             model = create_global_local_model(
                 segmentation_model, input_size, backbone=backbone, activation_function=activation_function
             )

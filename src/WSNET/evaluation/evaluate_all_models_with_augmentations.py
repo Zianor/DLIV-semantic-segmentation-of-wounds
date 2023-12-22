@@ -1,8 +1,9 @@
 import json
 import os
 from math import ceil
+from pathlib import Path
 
-from src.WSNET.augmentations_for_testing import (
+from src.WSNET.evaluation.augmentations_for_testing import (
     adjust_brightness,
     adjust_contrast,
     adjust_saturation,
@@ -73,9 +74,9 @@ def get_results_with_augmentations():
         return results
 
 
-def write_results_as_json(results):
-    with open(os.path.join("results", "evaluation_augmentations.json"), "w") as write_file:
-        json.dump(results, write_file)
+def write_results_as_json(results_dict):
+    with open(os.path.join(Path.cwd().parent, "results", "evaluation_augmentations.json"), "w") as write_file:
+        json.dump(results_dict, write_file)
 
 
 if __name__ == "__main__":

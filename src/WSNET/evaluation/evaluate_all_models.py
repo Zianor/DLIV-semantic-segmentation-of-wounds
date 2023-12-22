@@ -1,5 +1,6 @@
 import itertools
 import os
+from pathlib import Path
 
 from src.helper import (
     create_markdown_table_str_for_metrics,
@@ -38,6 +39,7 @@ if __name__ == "__main__":
     activation_function = "sigmoid"
     # mixed models
     combinations = itertools.permutations(segmentation_models, 2)
+    combinations = [combination for combination in combinations]
     markdown_lines.append("# Global-Local models with mixed architectures\n")
     for segmentation_model_tuple in combinations:
         markdown_lines.append(
@@ -51,7 +53,20 @@ if __name__ == "__main__":
         )
         markdown_lines.append(create_markdown_table_str_for_metrics(results_dict))
 
-    with open(os.path.join("results", "evaluation_results.md"), "w") as writer:
+    markdown_lines.append("# Global-Global models with mixed architectures\n")
+    for segmentation_model_tuple in combinations:
+        markdown_lines.append(
+            f"### Global-Global: {segmentation_model_tuple[0]}, {segmentation_model_tuple[1]}\n"
+        )
+        results_dict = evaluate_model(
+            segmentation_model=segmentation_model_tuple,
+            model_architecture="global-global",
+            activation_function=activation_function,
+            backbone="mobilenet",
+        )
+        markdown_lines.append(create_markdown_table_str_for_metrics(results_dict))
+
+    with open(os.path.join(Path.cwd().parent, "results", "evaluation_results.md"), "w") as writer:
         for line in markdown_lines:
             writer.write(line)
             writer.write("\n")
